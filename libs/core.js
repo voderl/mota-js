@@ -1,3 +1,4 @@
+export default core;
 /**
  * 初始化 start
  */
@@ -452,4 +453,3 @@ core.prototype.doFunc = function (func, _this) {
  * 系统机制 end
  */
 
-var core = new core();

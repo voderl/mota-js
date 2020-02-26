@@ -1,3 +1,5 @@
+export default ui;
+import {functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a} from '../project/functions'
 /**
  * ui.js：负责所有和UI界面相关的绘制
  * 包括：

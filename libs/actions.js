@@ -1,3 +1,6 @@
+export default actions;
+import functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a from '../project/functions'
+console.log(functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a)
 /*
 actions.js：用户交互的事件的处理
 键盘、鼠标、触摸屏事件相关

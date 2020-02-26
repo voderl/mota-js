@@ -1,5 +1,21 @@
-function main() {
-    test
+import {actions} from './libs/actions.js'
+import {control} from './libs/control.js'
+import {core} from './libs/core.js'
+import {data} from './libs/data.js'
+import {enemys} from './libs/enemys.js'
+import {events} from './libs/events.js'
+import {extensions} from './libs/extensions.js'
+import {icons} from './libs/icons.js'
+import {items} from './libs/items.js'
+import {loader} from './libs/loader.js'
+import {maps} from './libs/maps.js'
+import {ui} from './libs/ui.js'
+import {utils} from './libs/utils.js'
+import data_a1e2fb4a_e986_4524_b0da_9b7ba7c0874d from './project/data'
+import './styles.css';
+
+function _main() {
+    
     //------------------------ 用户修改内容 ------------------------//
 
     this.version = "2.6.6"; // 游戏版本号；如果更改了游戏内容建议修改此version以免造成缓存问题。
@@ -193,56 +209,58 @@ function main() {
     this.__VERSION_CODE__ = 99;
 }
 
-main.prototype.init = function (mode, callback) {
+_main.prototype.init = function (mode, callback) {
     for (var i = 0; i < main.dom.gameCanvas.length; i++) {
         main.canvas[main.dom.gameCanvas[i].id] = main.dom.gameCanvas[i].getContext('2d');
     }
     main.mode = mode;
-
-    main.loadJs('project', main.pureData, function(){
-        var mainData = data_a1e2fb4a_e986_4524_b0da_9b7ba7c0874d.main;
-        for(var ii in mainData)main[ii]=mainData[ii];
-        
-        main.dom.startBackground.src="project/images/"+main.startBackground;
-        main.dom.startLogo.style=main.startLogoStyle;
-        main.dom.startButtonGroup.style = main.startButtonsStyle;
-        main.levelChoose.forEach(function(value){
-            var span = document.createElement('span');
-            span.setAttribute('class','startButton');
-            span.innerText=value[0];
-            (function(span,str_){
-                span.onclick = function () {
-                    core.events.startGame(str_);
-                }
-            })(span,value[1]);
-            main.dom.levelChooseButtons.appendChild(span);
-        });
-        main.createOnChoiceAnimation();
-        
-        main.loadJs('libs', main.loadList, function () {
-            main.core = core;
-
-            for (i = 0; i < main.loadList.length; i++) {
-                var name = main.loadList[i];
-                if (name === 'core') continue;
-                main.core[name] = new window[name]();
+    //load project
+    var mainData = data_a1e2fb4a_e986_4524_b0da_9b7ba7c0874d.main;
+    for(var ii in mainData)main[ii]=mainData[ii];
+    main.dom.startBackground.src=require("./project/images/"+main.startBackground).default;
+    main.dom.startLogo.style=main.startLogoStyle;
+    main.dom.startButtonGroup.style = main.startButtonsStyle;
+    main.levelChoose.forEach(function(value){
+        var span = document.createElement('span');
+        span.setAttribute('class','startButton');
+        span.innerText=value[0];
+        (function(span,str_){
+            span.onclick = function () {
+                core.events.startGame(str_);
             }
-
-            main.loadFloors(function() {
-                var coreData = {};
-                ["dom", "statusBar", "canvas", "images", "tilesets", "materials",
-                    "animates", "bgms", "sounds", "floorIds", "floors"].forEach(function (t) {
-                    coreData[t] = main[t];
-                })
-                main.core.init(coreData, callback);
-                main.core.resize();
-            });
-        });
+        })(span,value[1]);
+        main.dom.levelChooseButtons.appendChild(span);
+    });
+    main.createOnChoiceAnimation();
+    
+    const _core = new core();
+    _core.actions = new actions();
+    _core.control = new control();
+    _core.data = new data();
+    _core.enemys = new enemys();
+    _core.events = new events();
+    _core.extensions = new extensions();
+    _core.icons = new icons();
+    _core.items = new items();
+    _core.loader = new loader();
+    _core.maps = new maps();
+    _core.ui = new ui();
+    _core.utils = new utils();
+    window.core = _core;
+    main.core = _core;
+    main.loadFloors(function() {
+        var coreData = {};
+        ["dom", "statusBar", "canvas", "images", "tilesets", "materials",
+            "animates", "bgms", "sounds", "floorIds", "floors"].forEach(function (t) {
+            coreData[t] = main[t];
+        })
+        main.core.init(coreData, callback);
+        main.core.resize();
     });
 }
 
 ////// 动态加载所有核心JS文件 //////
-main.prototype.loadJs = function (dir, loadList, callback) {
+_main.prototype.loadJs = function (dir, loadList, callback) {
 
     // 加载js
     main.setMainTipsText('正在加载核心js文件...')
@@ -267,7 +285,7 @@ main.prototype.loadJs = function (dir, loadList, callback) {
 }
 
 ////// 加载某一个JS文件 //////
-main.prototype.loadMod = function (dir, modName, callback, onerror) {
+_main.prototype.loadMod = function (dir, modName, callback, onerror) {
     var script = document.createElement('script');
     var name = modName;
     script.src = dir + '/' + modName + (this.useCompress?".min":"") + '.js?v=' + this.version;
@@ -278,7 +296,7 @@ main.prototype.loadMod = function (dir, modName, callback, onerror) {
 }
 
 ////// 动态加载所有楼层（剧本） //////
-main.prototype.loadFloors = function (callback) {
+_main.prototype.loadFloors = function (callback) {
 
     // 加载js
     main.setMainTipsText('正在加载楼层文件...')
@@ -305,21 +323,22 @@ main.prototype.loadFloors = function (callback) {
 }
 
 ////// 加载某一个楼层 //////
-main.prototype.loadFloor = function(floorId, callback) {
-    var script = document.createElement('script');
-    script.src = 'project/floors/' + floorId +'.js?v=' + this.version;
-    main.dom.body.appendChild(script);
-    script.onload = function () {
-        callback(floorId);
-    }
+_main.prototype.loadFloor = function(floorId, callback) {
+    // var script = document.createElement('script');
+    // script.src = 'project/floors/' + floorId +'.js?v=' + this.version;
+    // main.dom.body.appendChild(script);
+    // script.onload = function () {
+    //     callback(floorId);
+    // }
+    require('./project/floors/'+floorId+'.js');
 }
 
 ////// 加载过程提示 //////
-main.prototype.setMainTipsText = function (text) {
+_main.prototype.setMainTipsText = function (text) {
     main.dom.mainTips.innerHTML = text;
 }
 
-main.prototype.log = function (e) {
+_main.prototype.log = function (e) {
     if (e) {
         if (main.core && main.core.platform && !main.core.platform.isPC) {
             console.log((e.stack || e.toString()));
@@ -330,7 +349,7 @@ main.prototype.log = function (e) {
     }
 }
 
-main.prototype.createOnChoiceAnimation = function () {
+_main.prototype.createOnChoiceAnimation = function () {
     var borderColor = main.dom.startButtonGroup.style.caretColor || "rgb(255, 215, 0)";
     // get rgb value
     var rgb = /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(,\s*\d+\s*)?\)$/.exec(borderColor);
@@ -349,7 +368,7 @@ main.prototype.createOnChoiceAnimation = function () {
 }
 
 ////// 选项 //////
-main.prototype.selectButton = function (index) {
+_main.prototype.selectButton = function (index) {
     var select = function (children) {
         index = (index + children.length) % children.length;
         for (var i = 0;i < children.length; ++i) {
@@ -374,7 +393,7 @@ main.prototype.selectButton = function (index) {
     }
 }
 
-main.prototype.listen = function () {
+_main.prototype.listen = function () {
 
 ////// 窗口大小变化时 //////
 window.onresize = function () {
@@ -797,4 +816,6 @@ main.dom.inputNo.onclick = function () {
 
 }//listen end
 
-var main = new main();
+window.main = new _main();
+window.main.init('play');
+window.main.listen();

@@ -1,3 +1,4 @@
+export default extensions;
 /*
 extensions.js：负责拓展插件
  */

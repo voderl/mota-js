@@ -1,3 +1,6 @@
+export default control;
+import {functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a} from '../project/functions'
+import localforage from './thirdparty/localforage.min.js';
 /*
 control.js：游戏主要逻辑控制
 主要负责status相关内容，以及各种变量获取/存储

@@ -1,4 +1,4 @@
-var maps_90f36752_8815_4be8_b32b_d7fad1d0542e = 
+export default maps_90f36752_8815_4be8_b32b_d7fad1d0542e = 
 {
 	"1": {"cls":"terrains","id":"yellowWall","canBreak":true},
 	"2": {"cls":"terrains","id":"whiteWall","canBreak":true},

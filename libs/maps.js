@@ -1,3 +1,6 @@
+export default maps;
+import {maps_90f36752_8815_4be8_b32b_d7fad1d0542e} from '../project/maps'
+import PriorityQueue from './thirdparty/priority-queue.min.js'
 "use strict";
 
 function maps() {

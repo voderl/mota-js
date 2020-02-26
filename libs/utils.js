@@ -1,3 +1,6 @@
+export default utils;
+import localforage from './thirdparty/localforage.min.js';
+import LZString from './thirdparty/lz-string.min.js'
 /*
 utils.js 工具类
 

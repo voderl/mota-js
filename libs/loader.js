@@ -1,3 +1,4 @@
+export default loader;
 /*
 loader.js：负责对资源的加载
 

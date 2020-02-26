@@ -1,3 +1,6 @@
+export default events;
+import {functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a} from '../project/functions'
+import {events_c12a15a8_c380_4b28_8144_256cba95f760} from '../project/events'
 "use strict";
 
 function events() {
