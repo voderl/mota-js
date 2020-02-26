@@ -1,4 +1,4 @@
-export default events_c12a15a8_c380_4b28_8144_256cba95f760 = 
+export var events_c12a15a8_c380_4b28_8144_256cba95f760 = 
 {
 	"commonEvent": {
 		"加点事件": [

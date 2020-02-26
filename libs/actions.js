@@ -1,6 +1,5 @@
 export default actions;
-import functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a from '../project/functions'
-console.log(functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a)
+import { functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a } from '../project/functions'
 /*
 actions.js：用户交互的事件的处理
 键盘、鼠标、触摸屏事件相关
@@ -2651,7 +2650,7 @@ actions.prototype._onupPaint = function () {
     core.status.event.data.x = null;
     core.status.event.data.y = null;
     // 保存
-    core.paint[core.status.floorId] = lzw_encode(core.utils._encodeCanvas(core.dymCanvas.paint).join(","));
+    core.paint[core.status.floorId] = main.lzw.encode(core.utils._encodeCanvas(core.dymCanvas.paint).join(","));
 }
 
 actions.prototype.setPaintMode = function (mode) {
@@ -2672,7 +2671,7 @@ actions.prototype.savePaint = function () {
     var data = {};
     for (var floorId in core.paint) {
         if (core.paint[floorId])
-            data[floorId] = lzw_decode(core.paint[floorId]);
+            data[floorId] = main.lzw.decode(core.paint[floorId]);
     }
     core.download(core.firstData.name + ".h5paint", JSON.stringify({
         'name': core.firstData.name,
@@ -2693,12 +2692,12 @@ actions.prototype.loadPaint = function () {
         core.paint = {};
         for (var floorId in obj.paint) {
             if (obj.paint[floorId])
-                core.paint[floorId] = lzw_encode(obj.paint[floorId]);
+                core.paint[floorId] = main.lzw.encode(obj.paint[floorId]);
         }
 
         core.clearMap('paint');
         var value = core.paint[core.status.floorId];
-        if (value) value = lzw_decode(value).split(",");
+        if (value) value = main.lzw.decode(value).split(",");
         core.utils._decodeCanvas(value, 32 * core.bigmap.width, 32 * core.bigmap.height);
         core.drawImage('paint', core.bigmap.tempCanvas.canvas, 0, 0);
 

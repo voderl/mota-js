@@ -1,17 +1,17 @@
-import {actions} from './libs/actions.js'
-import {control} from './libs/control.js'
-import {core} from './libs/core.js'
-import {data} from './libs/data.js'
-import {enemys} from './libs/enemys.js'
-import {events} from './libs/events.js'
-import {extensions} from './libs/extensions.js'
-import {icons} from './libs/icons.js'
-import {items} from './libs/items.js'
-import {loader} from './libs/loader.js'
-import {maps} from './libs/maps.js'
-import {ui} from './libs/ui.js'
-import {utils} from './libs/utils.js'
-import data_a1e2fb4a_e986_4524_b0da_9b7ba7c0874d from './project/data'
+import actions from './libs/actions.js'
+import control from './libs/control.js'
+import _core from './libs/core.js'
+import data from './libs/data.js'
+import enemys from './libs/enemys.js'
+import events from './libs/events.js'
+import extensions from './libs/extensions.js'
+import icons from './libs/icons.js'
+import items from './libs/items.js'
+import loader from './libs/loader.js'
+import maps from './libs/maps.js'
+import ui from './libs/ui.js'
+import utils from './libs/utils.js'
+import { data_a1e2fb4a_e986_4524_b0da_9b7ba7c0874d } from './project/data'
 import './styles.css';
 
 function _main() {
@@ -233,21 +233,23 @@ _main.prototype.init = function (mode, callback) {
     });
     main.createOnChoiceAnimation();
     
-    const _core = new core();
-    _core.actions = new actions();
-    _core.control = new control();
-    _core.data = new data();
-    _core.enemys = new enemys();
-    _core.events = new events();
-    _core.extensions = new extensions();
-    _core.icons = new icons();
-    _core.items = new items();
-    _core.loader = new loader();
-    _core.maps = new maps();
-    _core.ui = new ui();
-    _core.utils = new utils();
-    window.core = _core;
-    main.core = _core;
+    const core = new _core();
+    window.core = core;
+    main.core = core;
+    core.actions = new actions();
+    core.control = new control();
+    core.data = new data();
+    core.enemys = new enemys();
+    core.events = new events();
+    core.extensions = new extensions();
+    core.icons = new icons();
+    core.items = new items();
+    core.loader = new loader();
+    core.maps = new maps();
+    core.ui = new ui();
+    core.utils = new utils();
+    console.log(utils.prototype);
+    main.lzw=utils.lzw;
     main.loadFloors(function() {
         var coreData = {};
         ["dom", "statusBar", "canvas", "images", "tilesets", "materials",
@@ -331,6 +333,7 @@ _main.prototype.loadFloor = function(floorId, callback) {
     //     callback(floorId);
     // }
     require('./project/floors/'+floorId+'.js');
+    callback(floorId);
 }
 
 ////// 加载过程提示 //////

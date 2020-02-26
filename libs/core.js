@@ -1,11 +1,12 @@
-export default core;
+export default _core;
+import {plugins_bb40132b_638b_4a9f_b028_d3fe47acc8d1} from '../project/plugins'
 /**
  * 初始化 start
  */
 
 "use strict";
 
-function core() {
+function _core() {
     this.__SIZE__ = 13;
     this.__PIXELS__ = this.__SIZE__ * 32;
     this.__HALF_SIZE__ = Math.floor(this.__SIZE__ / 2);
@@ -221,7 +222,7 @@ function core() {
 /////////// 系统事件相关 ///////////
 
 ////// 初始化 //////
-core.prototype.init = function (coreData, callback) {
+_core.prototype.init = function (coreData, callback) {
     this._forwardFuncs();
     for (var key in coreData)
         core[key] = coreData[key];
@@ -237,7 +238,7 @@ core.prototype.init = function (coreData, callback) {
     });
 }
 
-core.prototype._init_flags = function () {
+_core.prototype._init_flags = function () {
     core.flags = core.clone(core.data.flags);
     core.values = core.clone(core.data.values);
     core.firstData = core.clone(core.data.firstData);
@@ -284,7 +285,7 @@ core.prototype._init_flags = function () {
     core.material.icons = core.icons.getIcons();
 }
 
-core.prototype._init_sys_flags = function () {
+_core.prototype._init_sys_flags = function () {
     if (!core.flags.enableExperience) core.flags.enableLevelUp = false;
     if (!core.flags.enableLevelUp) core.flags.levelUpLeftMode = false;
     if (core.flags.equipboxButton) core.flags.equipment = true;
@@ -295,7 +296,7 @@ core.prototype._init_sys_flags = function () {
     core.values.moveSpeed = core.getLocalStorage('moveSpeed', core.values.moveSpeed);
 }
 
-core.prototype._init_platform = function () {
+_core.prototype._init_platform = function () {
     core.platform.isOnline = location.protocol.indexOf("http") == 0;
     if (!core.platform.isOnline) alert("请勿直接打开html文件！使用启动服务或者APP进行离线游戏。");
     window.AudioContext = window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext;
@@ -338,7 +339,7 @@ core.prototype._init_platform = function () {
     }
 }
 
-core.prototype._init_checkLocalForage = function () {
+_core.prototype._init_checkLocalForage = function () {
     core.platform.useLocalForage = core.getLocalStorage('useLocalForage', true);
     var _error = function (e) {
         main.log(e);
@@ -346,11 +347,11 @@ core.prototype._init_checkLocalForage = function () {
     };
     if (core.platform.useLocalForage) {
         try {
-            core.setLocalForage("__test__", lzw_encode("__test__"), function () {
+            core.setLocalForage("__test__", main.lzw.encode("__test__"), function () {
                 try {
                     core.getLocalForage("__test__", null, function (data) {
                         try {
-                            if (lzw_decode(data) != "__test__") {
+                            if (main.lzw.decode(data) != "__test__") {
                                 console.log("localForage unsupported!");
                                 core.platform.useLocalForage = false;
                             }
@@ -369,7 +370,7 @@ core.prototype._init_checkLocalForage = function () {
     }
 }
 
-core.prototype._init_others = function () {
+_core.prototype._init_others = function () {
     // 一些额外的东西
     core.material.groundCanvas = document.createElement('canvas').getContext('2d');
     core.material.groundCanvas.canvas.width = core.material.groundCanvas.canvas.height = 32;
@@ -382,7 +383,7 @@ core.prototype._init_others = function () {
     core.control.getSaveIndexes(function (indexes) { core.saves.ids = indexes; });
 }
 
-core.prototype._afterLoadResources = function (callback) {
+_core.prototype._afterLoadResources = function (callback) {
     // 初始化地图
     core.initStatus.maps = core.maps._initMaps();
     core.control._setRequestAnimationFrame();
@@ -392,7 +393,7 @@ core.prototype._afterLoadResources = function (callback) {
     if (callback) callback();
 }
 
-core.prototype._initPlugins = function () {
+_core.prototype._initPlugins = function () {
     core.plugin = new function () {};
 
     for (var name in plugins_bb40132b_638b_4a9f_b028_d3fe47acc8d1) {
@@ -410,7 +411,7 @@ core.prototype._initPlugins = function () {
     core._forwardFunc("plugin");
 }
 
-core.prototype._forwardFuncs = function () {
+_core.prototype._forwardFuncs = function () {
     for (var i = 0; i < main.loadList.length; ++i) {
         var name = main.loadList[i];
         if (name == 'core') continue;
@@ -418,7 +419,7 @@ core.prototype._forwardFuncs = function () {
     }
 }
 
-core.prototype._forwardFunc = function (name, funcname) {
+_core.prototype._forwardFunc = function (name, funcname) {
     if (funcname == null) {
         for (funcname in core[name]) {
             if (funcname.charAt(0) != "_" && core[name][funcname] instanceof Function) {
@@ -427,11 +428,11 @@ core.prototype._forwardFunc = function (name, funcname) {
         }
         return;
     }
-
     if (core[funcname]) {
         console.error("ERROR: 无法转发 "+name+" 中的函数 "+funcname+" 到 core 中！同名函数已存在。");
         return;
     }
+    //core[funcname]=(...args)=>core[name][funcname](...args);
     var parameterInfo = /^\s*function\s*[\w_$]*\(([\w_,$\s]*)\)\s*\{/.exec(core[name][funcname].toString());
     var parameters = (parameterInfo == null ? "" : parameterInfo[1]).replace(/\s*/g, '').replace(/,/g, ', ');
     // core[funcname] = new Function(parameters, "return core."+name+"."+funcname+"("+parameters+");");
@@ -441,7 +442,7 @@ core.prototype._forwardFunc = function (name, funcname) {
     }
 }
 
-core.prototype.doFunc = function (func, _this) {
+_core.prototype.doFunc = function (func, _this) {
     if (typeof func == 'string') {
         func = core.plugin[func];
         _this = core.plugin;

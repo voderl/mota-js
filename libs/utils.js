@@ -136,7 +136,7 @@ utils.prototype.push = function (a, b) {
 
 utils.prototype.decompress = function (value) {
     try {
-        var output = lzw_decode(value);
+        var output = main.lzw.decode(value);
         if (output) return JSON.parse(output);
     }
     catch (e) {
@@ -167,11 +167,11 @@ utils.prototype.setLocalStorage = function (key, value) {
         var str = JSON.stringify(value).replace(/[\u007F-\uFFFF]/g, function (chr) {
             return "\\u" + ("0000" + chr.charCodeAt(0).toString(16)).substr(-4)
         });
-        var compressed = lzw_encode(str);
+        var compressed = main.lzw.encode(str);
 
         // test if we can save to localStorage
         localStorage.setItem("__tmp__", compressed);
-        if (lzw_decode(localStorage.getItem("__tmp__")) == str) {
+        if (main.lzw.decode(localStorage.getItem("__tmp__")) == str) {
             localStorage.setItem(core.firstData.name + "_" + key, compressed);
         }
         else {
@@ -222,7 +222,7 @@ utils.prototype.setLocalForage = function (key, value, successCallback, errorCal
     }
 
     // Save to localforage
-    var compressed = lzw_encode(JSON.stringify(value).replace(/[\u007F-\uFFFF]/g, function (chr) {
+    var compressed = main.lzw.encode(JSON.stringify(value).replace(/[\u007F-\uFFFF]/g, function (chr) {
         return "\\u" + ("0000" + chr.charCodeAt(0).toString(16)).substr(-4)
     }));
     localforage.setItem(core.firstData.name + "_" + key, compressed, function (err) {
@@ -1248,7 +1248,10 @@ utils.prototype.http = function (type, url, formData, success, error, mimeType, 
         xhr.send(formData);
     else xhr.send();
 }
-
+utils.lzw={
+    encode:lzw_encode,
+    decode:lzw_decode,
+}
 // LZW-compress
 // https://gist.github.com/revolunet/843889
 function lzw_encode(s) {

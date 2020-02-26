@@ -2052,7 +2052,7 @@ ui.prototype.drawMaps = function (index, x, y) {
     if (data.paint) {
         var offsetX = 32 * (data.x - this.HSIZE), offsetY = 32 * (data.y - this.HSIZE);
         var value = core.paint[data.floorId];
-        if (value) value = lzw_decode(value).split(",");
+        if (value) value = main.lzw.decode(value).split(",");
         core.utils._decodeCanvas(value, 32 * data.mw, 32 * data.mh);
         core.drawImage('ui', core.bigmap.tempCanvas.canvas, offsetX * 32, offsetY * 32,
             this.PIXEL, this.PIXEL, 0, 0, this.PIXEL, this.PIXEL);
@@ -2814,7 +2814,7 @@ ui.prototype._drawPaint_draw = function () {
 
     // 将已有的内容绘制到route上
     var value = core.paint[core.status.floorId];
-    if (value) value = lzw_decode(value).split(",");
+    if (value) value = main.lzw.decode(value).split(",");
     core.utils._decodeCanvas(value, 32*core.bigmap.width, 32*core.bigmap.height);
     core.drawImage('paint', core.bigmap.tempCanvas.canvas, 0, 0);
 

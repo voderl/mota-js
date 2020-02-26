@@ -1,4 +1,4 @@
-export default icons_4665ee12_3a1f_44a4_bea3_0fccba634dc1 = 
+export var icons_4665ee12_3a1f_44a4_bea3_0fccba634dc1 = 
 {
 	"hero": {
 		"down": {
