@@ -1,3 +1,5 @@
+import '../pixi/pixi';
+
 import actions from './libs/actions.js'
 import control from './libs/control.js'
 import _core from './libs/core.js'
