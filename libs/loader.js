@@ -24,30 +24,43 @@ loader.prototype._setStartLoadTipText = function (text) {
 }
 
 loader.prototype._load = function (callback) {
-    this._loadIcons();
-    this._loadAnimates();
-    this._loadMusic();
-
-    core.loader._loadMaterialImages(function () {
+    //this._loadIcons();
+    //this._loadAnimates();
+    //this._loadMusic();
+    
+    pixi.loader.start((textures) => {
+        console.log('load完成');
+        this._loadIcons(textures);
+        this._loadAnimates(textures);
+    })
+/*     core.loader._loadMaterialImages(function () {
         core.loader._loadExtraImages(function () {
             core.loader._loadAutotiles(function () {
                 core.loader._loadTilesets(callback);
             })
         })
-    });
+    }); */
 }
 
-loader.prototype._loadIcons = function () {
-    this.loadImage("icons.png", function (id, image) {
-        var images = core.splitImage(image);
-        for (var key in core.statusBar.icons) {
-            if (typeof core.statusBar.icons[key] == 'number') {
-                core.statusBar.icons[key] = images[core.statusBar.icons[key]];
-                if (core.statusBar.image[key] != null)
-                    core.statusBar.image[key].src = core.statusBar.icons[key].src;
-            }
-        }
-    });
+loader.prototype._loadIcons = function (textures) {
+    // this.loadImage("icons.png", function (id, image) {
+    //     var images = core.splitImage(image);
+    //     for (var key in core.statusBar.icons) {
+    //         if (typeof core.statusBar.icons[key] == 'number') {
+    //             core.statusBar.icons[key] = images[core.statusBar.icons[key]];
+    //             if (core.statusBar.image[key] != null)
+    //                 core.statusBar.image[key].src = core.statusBar.icons[key].src;
+    //         }
+    //     }
+    // });
+    const data = Object.keys(main.statusBar.icons);
+    const temp = { };
+    data.forEach((name) => {
+        const t = textures[name];
+        if (!t) return;
+        temp[name] = t; 
+    })
+    core.statusBar.textures = temp;
 }
 
 loader.prototype._loadMaterialImages = function (callback) {
@@ -212,76 +225,109 @@ loader.prototype.loadImage = function (imgName, callback) {
     }
 }
 
-loader.prototype._loadAnimates = function () {
+loader.prototype._loadAnimates = function (textures) {
     this._setStartLoadTipText("正在加载动画文件...");
-    if (main.useCompress) {
-        core.unzip('project/animates/animates.h5data?v=' + main.version, function (animates) {
-            for (var name in animates) {
-                if (name.endsWith(".animate")) {
-                    var t = name.substring(0, name.length - 8);
-                    if (core.animates.indexOf(t) >= 0)
-                        core.loader._loadAnimate(t, animates[name]);
-                }
-            }
-        }, null, true);
-    } else {
-        core.animates.forEach(function (t) {
-            core.http('GET', 'project/animates/' + t + ".animate?v=" + main.version, null, function (content) {
-                core.loader._loadAnimate(t, content);
-            }, function (e) {
-                main.log(e);
-                core.material.animates[t] = null;
-            }, "text/plain; charset=x-user-defined")
-        })
-    }
+    // if (main.useCompress) {
+    //     core.unzip('project/animates/animates.h5data?v=' + main.version, function (animates) {
+    //         for (var name in animates) {
+    //             if (name.endsWith(".animate")) {
+    //                 var t = name.substring(0, name.length - 8);
+    //                 if (core.animates.indexOf(t) >= 0)
+    //                     core.loader._loadAnimate(t, animates[name]);
+    //             }
+    //         }
+    //     }, null, true);
+    // } else {
+    //     core.animates.forEach(function (t) {
+    //         core.http('GET', 'project/animates/' + t + ".animate?v=" + main.version, null, function (content) {
+    //             core.loader._loadAnimate(t, content);
+    //         }, function (e) {
+    //             main.log(e);
+    //             core.material.animates[t] = null;
+    //         }, "text/plain; charset=x-user-defined")
+    //     })
+    // }
+    const all = textures.animates;
+    Object.keys(all).forEach((id) => {
+        this._loadAnimate(textures, id, all[id]);
+    })
 }
 
-loader.prototype._loadAnimate = function (name, content) {
-    try {
-        content = JSON.parse(content);
-        var data = {};
-        data.ratio = content.ratio;
-        data.se = content.se;
-        data.images = [];
-        data.images_rev = [];
-        content.bitmaps.forEach(function (t2) {
-            if (!t2) {
-                data.images.push(null);
-            }
-            else {
-                try {
-                    var image = new Image();
-                    image.src = t2;
-                    data.images.push(image);
-                } catch (e) {
-                    main.log(e);
-                    data.images.push(null);
-                }
-            }
-        })
-        data.frame = content.frame_max;
-        data.frames = [];
-        content.frames.forEach(function (t2) {
-            var info = [];
-            t2.forEach(function (t3) {
-                info.push({
-                    'index': t3[0],
-                    'x': t3[1],
-                    'y': t3[2],
-                    'zoom': t3[3],
-                    'opacity': t3[4],
-                    'mirror': t3[5] || 0,
-                    'angle': t3[6] || 0,
-                })
+loader.prototype._loadAnimate = function (textures, name, content) {
+    // TODO: 生成动画的animateSprite
+    // 或者还是每帧每帧绘制 ？50ms 一帧 不做渐变了？ 可以考虑做！ ？
+    // 3次更新一帧 ，？ 后面再加  暂时不动它 先做scene 
+    // 考虑todo  createJS.Sound.js
+    content.bitmaps.map((frame, i) => {
+        if(frame) {
+            const id =`${name}-${i}`;
+            const temp = textures[id];
+            delete textures[id];
+            return temp;
+        }
+        return null;
+    });
+    content.frame = content.frame_max;
+    content.frames.map((data) => {
+        const info = [];
+        data.forEach(function (t3) {
+            info.push({
+                'index': t3[0],
+                'x': t3[1],
+                'y': t3[2],
+                'zoom': t3[3],
+                'opacity': t3[4],
+                'mirror': t3[5] || 0,
+                'angle': t3[6] || 0,
             })
-            data.frames.push(info);
         })
-        core.material.animates[name] = data;
-    }
-    catch (e) {
-        main.log(e);
-        core.material.animates[name] = null;
-    }
+        return info;
+    })
+    // try {
+    //     content = JSON.parse(content);
+    //     var data = {};
+    //     data.ratio = content.ratio;
+    //     data.se = content.se;
+    //     data.images = [];
+    //     data.images_rev = [];
+    //     content.bitmaps.forEach(function (t2) {
+    //         if (!t2) {
+    //             data.images.push(null);
+    //         }
+    //         else {
+    //             try {
+    //                 var image = new Image();
+    //                 image.src = t2;
+    //                 data.images.push(image);
+    //             } catch (e) {
+    //                 main.log(e);
+    //                 data.images.push(null);
+    //             }
+    //         }
+    //     })
+    //     data.frame = content.frame_max;
+    //     data.frames = [];
+    //     content.frames.forEach(function (t2) {
+    //         var info = [];
+    //         t2.forEach(function (t3) {
+    //             info.push({
+    //                 'index': t3[0],
+    //                 'x': t3[1],
+    //                 'y': t3[2],
+    //                 'zoom': t3[3],
+    //                 'opacity': t3[4],
+    //                 'mirror': t3[5] || 0,
+    //                 'angle': t3[6] || 0,
+    //             })
+    //         })
+    //         data.frames.push(info);
+    //     })
+    //     core.material.animates[name] = data;
+    // }
+    // catch (e) {
+    //     main.log(e);
+    //     core.material.animates[name] = null;
+    // }
 }
 
 ////// 加载音频 //////

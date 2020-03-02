@@ -250,8 +250,8 @@ _main.prototype.init = function (mode, callback) {
     core.maps = new maps();
     core.ui = new ui();
     core.utils = new utils();
-    console.log(utils.prototype);
     main.lzw=utils.lzw;
+    
     main.loadFloors(function() {
         var coreData = {};
         ["dom", "statusBar", "canvas", "images", "tilesets", "materials",
