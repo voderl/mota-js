@@ -51,18 +51,6 @@ icons.prototype.getTilesetOffset = function (id) {
     else if (typeof id != 'number') {
         return null;
     }
-
-    core.tilesets = core.tilesets || [];
-    var startOffset = this.tilesetStartOffset;
-    for (var i in core.tilesets) {
-        var imgName = core.tilesets[i];
-        var img = core.material.images.tilesets[imgName];
-        var width = Math.floor(img.width / 32), height = Math.floor(img.height / 32);
-        if (id >= startOffset && id < startOffset + width * height) {
-            var x = (id - startOffset) % width, y = parseInt((id - startOffset) / width);
-            return {"image": imgName, "x": x, "y": y};
-        }
-        startOffset += this.tilesetStartOffset;
-    }
+    if (id >= this.tilesetStartOffset) return true;
     return null;
 }

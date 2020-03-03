@@ -32,6 +32,7 @@ loader.prototype._load = function (callback) {
         console.log('load完成');
         this._loadIcons(textures);
         this._loadAnimates(textures);
+        callback();
     })
 /*     core.loader._loadMaterialImages(function () {
         core.loader._loadExtraImages(function () {

@@ -258,7 +258,9 @@ _main.prototype.init = function (mode, callback) {
             "animates", "bgms", "sounds", "floorIds", "floors"].forEach(function (t) {
             coreData[t] = main[t];
         })
+        pixi.event.emit('resize');
         main.core.init(coreData, callback);
+
         main.core.resize();
     });
 }
