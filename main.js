@@ -251,7 +251,11 @@ _main.prototype.init = function (mode, callback) {
     core.ui = new ui();
     core.utils = new utils();
     main.lzw=utils.lzw;
-    
+    main.loadFile = {
+        images:require.context('./project/images',false,/\.(png|svg|jpg|gif|ico)$/),
+        animates:require.context('./project/animates',false,/\.animate$/),
+        sounds:require.context('./project/sounds',false,/\.(mp3|wav|wma|ogg|ape|acc)$/),
+    };
     main.loadFloors(function() {
         var coreData = {};
         ["dom", "statusBar", "canvas", "images", "tilesets", "materials",

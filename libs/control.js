@@ -332,6 +332,9 @@ control.prototype._animationFrame_checkConsoleOpened = function (timestamp) {
 
 ////// 显示游戏开始界面 //////
 control.prototype.showStartAnimate = function (noAnimate, callback) {
+    return core.events.startGame('easy', undefined, undefined, () => {
+        pixi.event.emit('start');
+    });
     this._showStartAnimate_resetDom();
     if (core.flags.startUsingCanvas || noAnimate)
         return this._showStartAnimate_finished(core.flags.startUsingCanvas, callback);
