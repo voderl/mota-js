@@ -144,7 +144,7 @@ export var functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a =
 
 	// ---------- 重绘新地图；这一步将会设置core.status.floorId ---------- //
 	core.drawMap(floorId);
-
+	pixi.event.emit('start');
 	// 切换楼层BGM
 	if (core.status.maps[floorId].bgm) {
 		var bgm = core.status.maps[floorId].bgm;

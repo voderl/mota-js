@@ -93,6 +93,7 @@ maps.prototype.getBlockByNumber = function (number) {
 
 ////// 数字和ID的对应关系 //////
 maps.prototype.initBlock = function (x, y, id, addInfo, eventFloor) {
+    return pixi.getBlock(id, x, y, addInfo, eventFloor);
     var disable = null;
     id = "" + (id || 0);
     if (id.endsWith(":f")) disable = true;

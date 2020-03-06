@@ -333,7 +333,6 @@ control.prototype._animationFrame_checkConsoleOpened = function (timestamp) {
 ////// 显示游戏开始界面 //////
 control.prototype.showStartAnimate = function (noAnimate, callback) {
     return core.events.startGame('easy', undefined, undefined, () => {
-        pixi.event.emit('start');
     });
     this._showStartAnimate_resetDom();
     if (core.flags.startUsingCanvas || noAnimate)
@@ -818,12 +817,16 @@ control.prototype.drawHero = function (status, offset) {
     core.clearMap('hero');
     core.status.heroCenter.px = 32 * x + offsetX + 16;
     core.status.heroCenter.py = 32 * y + offsetY + 32 - core.material.icons.hero.height / 2;
-
+    const heroSprite = core.status.heroSprite;
+    if (!heroSprite) return;
     if (!core.hasFlag('hideHero')) {
         this._drawHero_getDrawObjs(direction, x, y, status, offset).forEach(function (block) {
             core.drawImage('hero', block.img, block.heroIcon[block.status]*block.width,
                 block.heroIcon.loc * block.height, block.width, block.height,
                 block.posx+(32-block.width)/2, block.posy+32-block.height, block.width, block.height);
+            if (heroSprite.status !== direction) heroSprite.change(direction);
+            heroSprite.gotoAndStop(block.heroIcon[block.status]);
+            heroSprite.position.set(block.posx+(32-block.width)/2, block.posy+32-block.height);
         });
     }
 
