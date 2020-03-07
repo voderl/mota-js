@@ -144,7 +144,7 @@ export var functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a =
 
 	// ---------- 重绘新地图；这一步将会设置core.status.floorId ---------- //
 	core.drawMap(floorId);
-	pixi.event.emit('start');
+	pixi.event.emit('drawMap');
 	// 切换楼层BGM
 	if (core.status.maps[floorId].bgm) {
 		var bgm = core.status.maps[floorId].bgm;
@@ -1033,93 +1033,7 @@ export var functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a =
 	}, true);
 },
         "updateStatusBar": function () {
-	// 更新状态栏
-
-	// 检查等级
-	core.events.checkLvUp();
-
-	// 检查HP上限
-	if (core.flags.enableHPMax) {
-		core.setStatus('hp', Math.min(core.getStatus('hpmax'), core.getStatus('hp')));
-	}
-
-	// 设置楼层名
-	if (core.status.floorId) {
-		core.setStatusBarInnerHTML('floor', core.status.maps[core.status.floorId].name);
-	}
-
-	// 设置勇士名字和图标
-	core.setStatusBarInnerHTML('name', core.getStatus('name'));
-	// 设置等级名称
-	core.setStatusBarInnerHTML('lv', core.getLvName());
-
-	// 设置生命上限、生命值、攻防魔防金币和经验值
-	var statusList = ['hpmax', 'hp', 'mana', 'atk', 'def', 'mdef', 'money', 'experience'];
-	statusList.forEach(function (item) {
-		// 向下取整
-		core.status.hero[item] = Math.floor(core.status.hero[item]);
-		// 大数据格式化
-		core.setStatusBarInnerHTML(item, core.getRealStatus(item));
-	});
-
-	// 设置魔力值
-	if (core.flags.enableMana) {
-		// status:manamax 只有在非负时才生效。
-		if (core.status.hero.manamax != null && core.getRealStatus('manamax') >= 0) {
-			core.status.hero.mana = Math.min(core.status.hero.mana, core.getRealStatus('manamax'));
-			core.setStatusBarInnerHTML('mana', core.status.hero.mana + "/" + core.getRealStatus('manamax'));
-		}
-		else {
-			core.setStatusBarInnerHTML("mana", core.status.hero.mana);
-		}
-	}
-	// 设置技能栏
-	if (core.flags.enableSkill) {
-		// 可以用flag:skill表示当前开启的技能类型，flag:skillName显示技能名；详见文档-个性化-技能塔的支持
-		core.setStatusBarInnerHTML('skill', core.getFlag('skillName', '无'));
-	}
-
-	// 可以在这里添加自己额外的状态栏信息，比如想攻击显示 +0.5 可以这么写：
-	// if (core.hasFlag('halfAtk')) core.setStatusBarInnerHTML('atk', core.statusBar.atk.innerText + "+0.5");
-
-	// 如果是自定义添加的状态栏，也需要在这里进行设置显示的数值
-
-	// 进阶
-	if (core.flags.enableLevelUp && core.status.hero.lv < core.firstData.levelUp.length) {
-		var need = core.calValue(core.firstData.levelUp[core.status.hero.lv].need);
-		if (core.flags.levelUpLeftMode)
-			core.setStatusBarInnerHTML('up', core.formatBigNumber(need - core.getStatus('experience')) || "");
-		else
-			core.setStatusBarInnerHTML('up', core.formatBigNumber(need) || "");
-	} else core.setStatusBarInnerHTML('up', "");
-
-	// 钥匙
-	var keys = ['yellowKey', 'blueKey', 'redKey'];
-	keys.forEach(function (key) {
-		core.setStatusBarInnerHTML(key, core.setTwoDigits(core.itemCount(key)));
-	});
-	// 毒衰咒
-	if (core.flags.enableDebuff) {
-		core.setStatusBarInnerHTML('poison', core.hasFlag('poison') ? "毒" : "");
-		core.setStatusBarInnerHTML('weak', core.hasFlag('weak') ? "衰" : "");
-		core.setStatusBarInnerHTML('curse', core.hasFlag('curse') ? "咒" : "");
-	}
-	// 破炸飞
-	if (core.flags.enablePZF) {
-		core.setStatusBarInnerHTML('pickaxe', "破" + core.itemCount('pickaxe'));
-		core.setStatusBarInnerHTML('bomb', "炸" + core.itemCount('bomb'));
-		core.setStatusBarInnerHTML('fly', "飞" + core.itemCount('centerFly'));
-	}
-
-	// 难度
-	core.statusBar.hard.innerText = core.status.hard;
-	// 自定义状态栏绘制
-	core.drawStatusBar();
-
-	// 更新阻激夹域的伤害值
-	core.updateCheckBlock();
-	// 更新全地图显伤
-	core.updateDamage();
+	pixi.event.fresh('updateStatusBar');
 },
         "updateCheckBlock": function (floorId) {
 	// 领域、夹击、阻击等的伤害值计算

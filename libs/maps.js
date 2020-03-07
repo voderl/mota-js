@@ -93,7 +93,7 @@ maps.prototype.getBlockByNumber = function (number) {
 
 ////// 数字和ID的对应关系 //////
 maps.prototype.initBlock = function (x, y, id, addInfo, eventFloor) {
-    return pixi.getBlock(id, x, y, addInfo, eventFloor);
+    return pixi.Block.get(id, x, y, addInfo, eventFloor);
     var disable = null;
     id = "" + (id || 0);
     if (id.endsWith(":f")) disable = true;
@@ -196,7 +196,7 @@ maps.prototype._initFloorMap = function (floorId) {
             if (map[x][y] == null) map[x][y] = 0;
             // check "disable"
             var event = core.floors[floorId].events[y + "," + x];
-            if (event && event.enable === false && main.mode == 'play') {
+            if (event && event.disable === false && main.mode == 'play') {
                 map[x][y] += ":f";
             }
         }
@@ -698,6 +698,7 @@ maps.prototype._automaticRoute_deepAdd = function (x, y) {
 
 ////// 绘制一个图块 //////
 maps.prototype.drawBlock = function (block, animate) {
+    return;
     if (block.event.id == 'none') return;
     var redraw = animate != null;
     if (!redraw) animate = 0;
@@ -1357,46 +1358,47 @@ maps.prototype.getBlockCls = function (x, y, floorId, showDisable) {
 
 ////// 获得某个图块或素材的信息，包括 ID，cls，图片，坐标，faceIds 等等 //////
 maps.prototype.getBlockInfo = function (block) {
-    if (!block) return null;
-    if (typeof block == 'string') { // 参数是ID
-        block = this.getNumberById(block);
-    }
-    if (typeof block == 'number') { // 参数是数字
-        if (block == 0) return null;
-        block = this.getBlockByNumber(block);
-    }
-    var number = block.id, id = block.event.id, cls = block.event.cls, name = block.event.name,
-        image = null, posX = 0, posY = 0, animate = block.event.animate,
-        height = block.event.height || 32, faceIds = {};
+    return pixi.Block.getInfo(block);
+    // if (!block) return null;
+    // if (typeof block == 'string') { // 参数是ID
+    //     block = this.getNumberById(block);
+    // }
+    // if (typeof block == 'number') { // 参数是数字
+    //     if (block == 0) return null;
+    //     block = this.getBlockByNumber(block);
+    // }
+    // var number = block.id, id = block.event.id, cls = block.event.cls, name = block.event.name,
+    //     image = null, posX = 0, posY = 0, animate = block.event.animate,
+    //     height = block.event.height || 32, faceIds = {};
 
-    if (id == 'none') return null;
-    else if (id == 'airwall') {
-        if (!core.material.images.airwall) return null;
-        image = core.material.images.airwall;
-        name = "空气墙";
-    }
-    else if (cls == 'tileset') {
-        var offset = core.icons.getTilesetOffset(id);
-        if (offset == null) return null;
-        posX = offset.x;
-        posY = offset.y;
-        image = core.material.images.tilesets[offset.image];
-    }
-    else if (cls == 'autotile') {
-        image = core.material.images.autotile[id];
-    }
-    else {
-        image = core.material.images[cls];
-        posY = core.material.icons[cls][id];
-        faceIds = block.event.faceIds || {};
-        if (core.material.enemys[id]) {
-            name = core.material.enemys[id].name;
-        } else if (core.material.items[id]) {
-            name = core.material.items[id].name;
-        }
-    }
+    // if (id == 'none') return null;
+    // else if (id == 'airwall') {
+    //     if (!core.material.images.airwall) return null;
+    //     image = core.material.images.airwall;
+    //     name = "空气墙";
+    // }
+    // else if (cls == 'tileset') {
+    //     var offset = core.icons.getTilesetOffset(id);
+    //     if (offset == null) return null;
+    //     posX = offset.x;
+    //     posY = offset.y;
+    //     image = core.material.images.tilesets[offset.image];
+    // }
+    // else if (cls == 'autotile') {
+    //     image = core.material.images.autotile[id];
+    // }
+    // else {
+    //     image = core.material.images[cls];
+    //     posY = core.material.icons[cls][id];
+    //     faceIds = block.event.faceIds || {};
+    //     if (core.material.enemys[id]) {
+    //         name = core.material.enemys[id].name;
+    //     } else if (core.material.items[id]) {
+    //         name = core.material.items[id].name;
+    //     }
+    // }
 
-    return {number: number, id: id, cls: cls, name: name, image: image, posX: posX, posY: posY, height: height, faceIds: faceIds, animate: animate};
+    // return {number: number, id: id, cls: cls, name: name, image: image, posX: posX, posY: posY, height: height, faceIds: faceIds, animate: animate};
 }
 
 ////// 搜索某个图块出现的所有位置 //////
@@ -1471,6 +1473,8 @@ maps.prototype.removeBlock = function (x, y, floorId) {
 
     var index = block.index;
 
+    //change
+    block.block.hide();
     // 删除动画，清除地图
     if (floorId == core.status.floorId) {
         core.removeGlobalAnimate(x, y);
@@ -1603,7 +1607,6 @@ maps.prototype.setBlock = function (number, x, y, floorId) {
         if (/^\d+$/.test(number)) number = parseInt(number);
         else number = core.getNumberById(number);
     }
-
     var block = this.initBlock(x, y, number, true, core.floors[floorId]);
     if (block.id == 0 && !block.event.trigger) {
         // 转变图块为0且该点无事件，视为隐藏
@@ -1612,13 +1615,16 @@ maps.prototype.setBlock = function (number, x, y, floorId) {
     }
     var originBlock = core.getBlock(x, y, floorId, true);
     if (floorId == core.status.floorId) {
-        core.removeGlobalAnimate(x, y);
-        core.clearMap('event', x * 32, y * 32, 32, 32);
-        if (originBlock != null) {
-            var height = (originBlock.block.event || {}).height || 32;
-            if (height > 32)
-                core.clearMap('event2', x * 32, y * 32 + 32 - height, 32, height - 32);
+        if (originBlock !== null) {
+            originBlock.block.hide();
         }
+        // core.removeGlobalAnimate(x, y);
+        // core.clearMap('event', x * 32, y * 32, 32, 32);
+        // if (originBlock != null) {
+        //     var height = (originBlock.block.event || {}).height || 32;
+        //     if (height > 32)
+        //         core.clearMap('event2', x * 32, y * 32 + 32 - height, 32, height - 32);
+        // }
     }
     if (originBlock == null) {
         core.status.maps[floorId].blocks.push(block);
@@ -1629,9 +1635,10 @@ maps.prototype.setBlock = function (number, x, y, floorId) {
         block = originBlock.block;
     }
     if (floorId == core.status.floorId && !block.disable) {
-        core.drawBlock(block);
-        if (block.event.cls != 'autotile')
-            core.addGlobalAnimate(block);
+        block.drawTo('event');
+        // core.drawBlock(block);
+        // if (block.event.cls != 'autotile')
+        //     core.addGlobalAnimate(block);
         core.updateStatusBar();
     }
 }
@@ -1773,24 +1780,26 @@ maps.prototype._getAndRemoveBlock = function (x, y) {
 
 ////// 显示移动某块的动画，达到{“type”:”move”}的效果 //////
 maps.prototype.moveBlock = function (x, y, steps, time, keep, callback) {
+    // TODO: 移动动画图块而不是一点点移动
     time = time || 500;
     var blockArr = this._getAndRemoveBlock(x, y);
     if (blockArr == null) {
         if (callback) callback();
         return;
     }
-    var block = blockArr[0], blockInfo = blockArr[1];
-    var moveSteps = (steps||[]).filter(function (t) {
+    const [block, blockInfo ] = blockArr;
+    const moveSteps = (steps||[]).filter(function (t) {
         return ['up','down','left','right','forward','backward'].indexOf(t)>=0;
     });
-    var canvases = this._initDetachedBlock(blockInfo, x, y, block.event.animate !== false);
-    this._moveDetachedBlock(blockInfo, 32 * x, 32 * y, 1, canvases);
-
-    var moveInfo = {
-        x: x, y: y, px: 32 * x, py: 32 * y, opacity: 1, keep: keep, lastDirection: null, offset: 1,
-        moveSteps: moveSteps, step: 0, per_time: time / 16 / core.status.replay.speed
-    }
-    this._moveBlock_doMove(blockInfo, canvases, moveInfo, callback);
+    pixi.maps.moveBlock(block, moveSteps, time, keep, callback);
+    
+    // // var canvases = this._initDetachedBlock(blockInfo, x, y, block.event.animate !== false);
+    // // this._moveDetachedBlock(blockInfo, 32 * x, 32 * y, 1, canvases);
+    // var moveInfo = {
+    //     x: x, y: y, px: 32 * x, py: 32 * y, opacity: 1, keep: keep, lastDirection: null, offset: 1,
+    //     moveSteps: moveSteps, step: 0, per_time: time / 16 / core.status.replay.speed
+    // }
+    // this._moveBlock_doMove(blockInfo, canvases, moveInfo, callback);
 }
 
 maps.prototype._moveBlock_doMove = function (blockInfo, canvases, moveInfo, callback) {
@@ -1808,6 +1817,10 @@ maps.prototype._moveBlock_doMove = function (blockInfo, canvases, moveInfo, call
         else
             core.maps._moveJumpBlock_finished(blockInfo, canvases, moveInfo, animate, callback);
     }, moveInfo.per_time);
+    // const event = pixi.game.getScene('event');
+    // event.addNode('sprite', {
+    //     texture: pixi.ui.getTexture(blockInfo)
+    // })
 
     core.animateFrame.asyncId[animate] = true;
 }

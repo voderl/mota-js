@@ -46,7 +46,7 @@ events.prototype._startGame_start = function (hard, seed, route, callback) {
     console.log('开始游戏');
     //change
     const maps = pixi.utils.cloneWith(core.initStatus.maps, (key) => {
-        if (key instanceof pixi.BaseBlock) return key.clone();
+        if (pixi.Block.isBlock(key)) return key.clone();
         return false;
     })
     core.resetGame(core.firstData.hero, hard, null, maps);

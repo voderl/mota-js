@@ -826,7 +826,8 @@ control.prototype.drawHero = function (status, offset) {
                 block.posx+(32-block.width)/2, block.posy+32-block.height, block.width, block.height);
             if (heroSprite.status !== direction) heroSprite.change(direction);
             heroSprite.gotoAndStop(block.heroIcon[block.status]);
-            heroSprite.position.set(block.posx+(32-block.width)/2, block.posy+32-block.height);
+            heroSprite.position.set(block.posx+(32-block.width)/2 + core.bigmap.offsetX
+            , block.posy+32-block.height + core.bigmap.offsetY);
         });
     }
 
@@ -898,9 +899,13 @@ control.prototype.addGameCanvasTranslate = function (x, y) {
 
 ////// 更新视野范围 //////
 control.prototype.updateViewport = function() {
-    core.bigmap.canvas.forEach(function(cn){
-        core.control.setGameCanvasTranslate(cn,-core.bigmap.offsetX,-core.bigmap.offsetY);
-    });
+    // core.bigmap.canvas.forEach(function(cn){
+    //     core.control.setGameCanvasTranslate(cn,-core.bigmap.offsetX,-core.bigmap.offsetY);
+    // });
+    //pixi.game.container.setTransform(- core.bigmap.offsetX,- core.bigmap.offsetY);
+    const container = pixi.game.container;
+    const [offsetX, offsetY] = container.zone;
+    pixi.game.container.setTransform(offsetX - core.bigmap.offsetX, offsetY - core.bigmap.offsetY);
     // ------ 路线
     core.relocateCanvas('route', core.status.automaticRoute.offsetX - core.bigmap.offsetX, core.status.automaticRoute.offsetY - core.bigmap.offsetY);
 }

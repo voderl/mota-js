@@ -1,3 +1,5 @@
+import { Texture } from "pixi.js";
+
 export default loader;
 /*
 loader.js：负责对资源的加载
@@ -29,13 +31,14 @@ loader.prototype._load = function (callback) {
         data.forEach((name) => {
             const t = textures[name];
             if (!t) return;
-            delete textures[name];
+            // delete textures[name];
             temp[name] = t; 
         })
         core.statusBar.textures = temp;
+        this._loadAnimates(textures);
     })
     this._loadIcons();
-    this._loadAnimates();
+    // this._loadAnimates();
     this._loadMusic();
 
     core.loader._loadMaterialImages(function () {
@@ -229,79 +232,168 @@ loader.prototype.loadImage = function (imgName, callback) {
     }
 }
 
-loader.prototype._loadAnimates = function () {
-    this._setStartLoadTipText("正在加载动画文件...");
-    if (main.useCompress) {
-        core.unzip('project/animates/animates.h5data?v=' + main.version, function (animates) {
-            for (var name in animates) {
-                if (name.endsWith(".animate")) {
-                    var t = name.substring(0, name.length - 8);
-                    if (core.animates.indexOf(t) >= 0)
-                        core.loader._loadAnimate(t, animates[name]);
-                }
-            }
-        }, null, true);
-    } else {
-        core.animates.forEach(function (t) {
-            var animates=main.loadFile.animates;
-            var src=animates('./'+t+'.animate').default;
+loader.prototype._loadAnimates = function (textures) {
+    // this._setStartLoadTipText("正在加载动画文件...");
+    // if (main.useCompress) {
+    //     core.unzip('project/animates/animates.h5data?v=' + main.version, function (animates) {
+    //         for (var name in animates) {
+    //             if (name.endsWith(".animate")) {
+    //                 var t = name.substring(0, name.length - 8);
+    //                 if (core.animates.indexOf(t) >= 0)
+    //                     core.loader._loadAnimate(t, animates[name]);
+    //             }
+    //         }
+    //     }, null, true);
+    // } else {
+    //     core.animates.forEach(function (t) {
+    //         var animates=main.loadFile.animates;
+    //         var src=animates('./'+t+'.animate').default;
 
-            core.http('GET', src, null, function (content) {
-                core.loader._loadAnimate(t, content);
-            }, function (e) {
-                main.log(e);
-                core.material.animates[t] = null;
-            }, "text/plain; charset=x-user-defined")
-        })
-    }
+    //         core.http('GET', src, null, function (content) {
+    //             core.loader._loadAnimate(t, content);
+    //         }, function (e) {
+    //             main.log(e);
+    //             core.material.animates[t] = null;
+    //         }, "text/plain; charset=x-user-defined")
+    //     })
+    // }
+    const { animates } = pixi.textures;
+    Object.keys(animates).forEach(id => {
+        this._loadAnimate(id, animates[id], textures);
+    })
+    core.material.animates = animates;
 }
-
-loader.prototype._loadAnimate = function (name, content) {
-    try {
-        content = JSON.parse(content);
-        var data = {};
-        data.ratio = content.ratio;
-        data.se = content.se;
-        data.images = [];
-        data.images_rev = [];
-        content.bitmaps.forEach(function (t2) {
-            if (!t2) {
-                data.images.push(null);
-            }
-            else {
-                try {
-                    var image = new Image();
-                    image.src = t2;
-                    data.images.push(image);
-                } catch (e) {
-                    main.log(e);
-                    data.images.push(null);
+// 设置animate类
+const set = (node, value) => {
+    if (!(value instanceof Object)) return;
+    const { x, y, zoom, opacity, mirror, angle } = value;
+    node.x = node.defaultX + x;
+    node.y = node.defaultY + y;
+    const ratio = zoom / 100;
+    if (mirror) node.scale.set(-ratio, ratio);
+    else node.scale.set(ratio, ratio);
+    node.alpha = opacity / 255;
+    node.rotation = angle * Math.PI / 180;
+}
+const generateSprite = (content) => {
+    const EMPTY = Texture.EMPTY;
+    const { nodes } = pixi;
+    const { frames, ratio, frame: max, bitmaps: textures } = content;
+    const spriteList = [];
+    frames.forEach((data, i) => {
+        data.forEach((value, j) => {
+            if(!(spriteList[j] instanceof Array)) spriteList[j] = new Array(max).fill(EMPTY);
+            spriteList[j][i] = textures[value.index];
+        })
+    });
+    const sprites = spriteList.map((arr, i) => {
+        const node = nodes.getNode('sprite', {
+            texture: arr,
+            time: 50,
+            init(){
+                this.stop();
+                this.anchor.set(0.5,0.5);
+                this.loop = false;
+                this.defaultX = 0;
+                this.defaultY = 0;
+                this.onFrameChange = (j) => {
+                    if (j===0) {
+                        this.defaultX = this.x;
+                        this.defaultY = this.y;
+                    }
+                    if (this.texture === EMPTY) return;
+                    set(this, frames[j][i]);
+                }
+                this.onComplete = () => {
+                    this.remove();
                 }
             }
         })
-        data.frame = content.frame_max;
-        data.frames = [];
-        content.frames.forEach(function (t2) {
-            var info = [];
-            t2.forEach(function (t3) {
-                info.push({
-                    'index': t3[0],
-                    'x': t3[1],
-                    'y': t3[2],
-                    'zoom': t3[3],
-                    'opacity': t3[4],
-                    'mirror': t3[5] || 0,
-                    'angle': t3[6] || 0,
-                })
+    })
+}
+loader.prototype._loadAnimate = function (name, content, textures) {
+    // set BitMap
+    const index = content.bitmaps.lastIndexOf(1);
+    content.bitmaps = content.bitmaps.slice(0, index + 1);
+    content.bitmaps = content.bitmaps.map((value, i) => {
+        if (value) {
+            const id = `${name}-${i}`;
+            const result = textures[id];
+            if (result) {
+                delete textures[id];
+                return result;
+            }
+            return Texture.EMPTY;
+        }
+        return Texture.EMPTY;
+    })
+    // load Frame
+    content.frame = content.frame_max;
+    const arr = content.frames;
+    // TODO: to delete it
+    content.trashFrames = arr;
+    const frames = [];
+    arr.forEach(function (t2) {
+        const info = [];
+        t2.forEach(function (t3) {
+            info.push({
+                'index': t3[0],
+                'x': t3[1],
+                'y': t3[2],
+                'zoom': t3[3],
+                'opacity': t3[4],
+                'mirror': t3[5] || 0,
+                'angle': t3[6] || 0,
             })
-            data.frames.push(info);
         })
-        core.material.animates[name] = data;
-    }
-    catch (e) {
-        main.log(e);
-        core.material.animates[name] = null;
-    }
+        frames.push(info);
+    })
+    content.frames = frames;
+    // try {
+    //     content = JSON.parse(content);
+    //     var data = {};
+    //     data.ratio = content.ratio;
+    //     data.se = content.se;
+    //     data.images = [];
+    //     data.images_rev = [];
+    //     content.bitmaps.forEach(function (t2) {
+    //         if (!t2) {
+    //             data.images.push(null);
+    //         }
+    //         else {
+    //             try {
+    //                 var image = new Image();
+    //                 image.src = t2;
+    //                 data.images.push(image);
+    //             } catch (e) {
+    //                 main.log(e);
+    //                 data.images.push(null);
+    //             }
+    //         }
+    //     })
+    //     data.frame = content.frame_max;
+    //     data.frames = [];
+    //     content.frames.forEach(function (t2) {
+    //         var info = [];
+    //         t2.forEach(function (t3) {
+    //             info.push({
+    //                 'index': t3[0],
+    //                 'x': t3[1],
+    //                 'y': t3[2],
+    //                 'zoom': t3[3],
+    //                 'opacity': t3[4],
+    //                 'mirror': t3[5] || 0,
+    //                 'angle': t3[6] || 0,
+    //             })
+    //         })
+    //         data.frames.push(info);
+    //     })
+    //     core.material.animates[name] = data;
+    // }
+    // catch (e) {
+    //     main.log(e);
+    //     core.material.animates[name] = null;
+    // }
 }
 
 ////// 加载音频 //////
