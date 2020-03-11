@@ -1,4 +1,4 @@
-import { Texture } from "pixi.js";
+import { Texture } from "pixi.js-legacy";
 
 export default loader;
 /*
@@ -34,22 +34,23 @@ loader.prototype._load = function (callback) {
             // delete textures[name];
             temp[name] = t; 
         })
-        core.statusBar.textures = temp;
-        this._loadAnimates(textures);
+        core.statusBar.icons = temp;
+        callback();
+        // this._loadAnimates(textures);
     })
-    this._loadIcons();
+    // this._loadIcons();
     // this._loadAnimates();
     this._loadMusic();
 
-    core.loader._loadMaterialImages(function () {
-        core.loader._loadExtraImages(function () {
-            core.loader._loadAutotiles(function () {
-                core.loader._loadTilesets(()=>{
-                    callback();
-                });
-            })
-        })
-    });
+    // core.loader._loadMaterialImages(function () {
+    //     core.loader._loadExtraImages(function () {
+    //         core.loader._loadAutotiles(function () {
+    //             core.loader._loadTilesets(()=>{
+    //                 callback();
+    //             });
+    //         })
+    //     })
+    // });
 }
 
 loader.prototype._loadIcons = function () {

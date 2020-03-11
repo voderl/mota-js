@@ -652,16 +652,17 @@ events.prototype._changeFloor_getHeroLoc = function (floorId, stair, heroLoc) {
 }
 
 events.prototype._changeFloor_beforeChange = function (info, callback) {
-    core.playSound('floor.mp3');
-    // 需要 setTimeout 执行，不然会出错
-    window.setTimeout(function () {
-        if (info.time == 0)
-            core.events._changeFloor_changing(info, callback);
-        else
-            core.showWithAnimate(core.dom.floorMsgGroup, info.time / 2, function () {
-                core.events._changeFloor_changing(info, callback);
-            });
-    }, 25)
+    pixi.event.emit('changeFloor', info, callback);
+
+    // // 需要 setTimeout 执行，不然会出错
+    // window.setTimeout(function () {
+    //     if (info.time == 0)
+    //         core.events._changeFloor_changing(info, callback);
+    //     else
+    //         core.showWithAnimate(core.dom.floorMsgGroup, info.time / 2, function () {
+    //             core.events._changeFloor_changing(info, callback);
+    //         });
+    // }, 25)
 }
 
 events.prototype._changeFloor_changing = function (info, callback) {
@@ -2851,12 +2852,12 @@ events.prototype.canUseQuickShop = function (shopId) {
 ////// 设置角色行走图 //////
 events.prototype.setHeroIcon = function (name, noDraw) {
     name = core.getMappedName(name);
-    var img = core.material.images.images[name];
-    if (!img) return;
+    const texture = pixi.ui.getHeroTexture(name);
+    if (!texture) return;
     core.setFlag("heroIcon", name);
-    core.material.images.hero = img;
-    core.material.icons.hero.width = img.width / 4;
-    core.material.icons.hero.height = img.height / 4;
+    // core.material.images.hero = img;
+    // core.material.icons.hero.width = img.width / 4;
+    // core.material.icons.hero.height = img.height / 4;
     core.control.updateHeroIcon(name);
     if (!noDraw) core.drawHero();
 }

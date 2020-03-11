@@ -868,6 +868,7 @@ control.prototype._drawHero_getDrawObjs = function (direction, x, y, status, off
 
 ////// 设置画布偏移
 control.prototype.setGameCanvasTranslate = function(canvas,x,y){
+    return;
     var c=core.dom.gameCanvas[canvas];
     x=x*core.domStyle.scale;
     y=y*core.domStyle.scale;
@@ -1068,6 +1069,7 @@ control.prototype._checkBlock_ambush = function (ambush) {
 
 ////// 更新全地图显伤 //////
 control.prototype.updateDamage = function (floorId, ctx) {
+    return;
     floorId = floorId || core.status.floorId;
     if (!core.isset(floorId) || core.status.gameOver) return;
     if (core.status.gameOver) return;
@@ -2421,36 +2423,37 @@ control.prototype.updateStatusBar = function (doNotCheckAutoEvents) {
 }
 
 control.prototype._updateStatusBar_setToolboxIcon = function () {
-    if (core.isReplaying()) {
-        core.statusBar.image.book.src = core.status.replay.pausing ? core.statusBar.icons.play.src : core.statusBar.icons.pause.src;
-        core.statusBar.image.book.style.opacity = 1;
-        core.statusBar.image.fly.src = core.statusBar.icons.stop.src;
-        core.statusBar.image.fly.style.opacity = 1;
-        core.statusBar.image.toolbox.src = core.statusBar.icons.rewind.src;
-        core.statusBar.image.keyboard.src = core.statusBar.icons.book.src;
-        core.statusBar.image.shop.src = core.statusBar.icons.floor.src;
-        core.statusBar.image.save.src = core.statusBar.icons.speedDown.src;
-        core.statusBar.image.load.src = core.statusBar.icons.speedUp.src;
-        core.statusBar.image.settings.src = core.statusBar.icons.save.src;
-    }
-    else {
-        core.statusBar.image.book.src = core.statusBar.icons.book.src;
-        core.statusBar.image.book.style.opacity = core.hasItem('book') ? 1 : 0.3;
-        if (!core.flags.equipboxButton) {
-            core.statusBar.image.fly.src = core.statusBar.icons.fly.src;
-            core.statusBar.image.fly.style.opacity = core.hasItem('fly') ? 1 : 0.3;
-        }
-        else {
-            core.statusBar.image.fly.src = core.statusBar.icons.equipbox.src;
-            core.statusBar.image.fly.style.opacity = 1;
-        }
-        core.statusBar.image.toolbox.src = core.statusBar.icons.toolbox.src;
-        core.statusBar.image.keyboard.src = core.statusBar.icons.keyboard.src;
-        core.statusBar.image.shop.src = core.statusBar.icons.shop.src;
-        core.statusBar.image.save.src = core.statusBar.icons.save.src;
-        core.statusBar.image.load.src = core.statusBar.icons.load.src;
-        core.statusBar.image.settings.src = core.statusBar.icons.settings.src;
-    }
+    return;
+    // if (core.isReplaying()) {
+    //     core.statusBar.image.book.src = core.status.replay.pausing ? core.statusBar.icons.play.src : core.statusBar.icons.pause.src;
+    //     core.statusBar.image.book.style.opacity = 1;
+    //     core.statusBar.image.fly.src = core.statusBar.icons.stop.src;
+    //     core.statusBar.image.fly.style.opacity = 1;
+    //     core.statusBar.image.toolbox.src = core.statusBar.icons.rewind.src;
+    //     core.statusBar.image.keyboard.src = core.statusBar.icons.book.src;
+    //     core.statusBar.image.shop.src = core.statusBar.icons.floor.src;
+    //     core.statusBar.image.save.src = core.statusBar.icons.speedDown.src;
+    //     core.statusBar.image.load.src = core.statusBar.icons.speedUp.src;
+    //     core.statusBar.image.settings.src = core.statusBar.icons.save.src;
+    // }
+    // else {
+    //     core.statusBar.image.book.src = core.statusBar.icons.book.src;
+    //     core.statusBar.image.book.style.opacity = core.hasItem('book') ? 1 : 0.3;
+    //     if (!core.flags.equipboxButton) {
+    //         core.statusBar.image.fly.src = core.statusBar.icons.fly.src;
+    //         core.statusBar.image.fly.style.opacity = core.hasItem('fly') ? 1 : 0.3;
+    //     }
+    //     else {
+    //         core.statusBar.image.fly.src = core.statusBar.icons.equipbox.src;
+    //         core.statusBar.image.fly.style.opacity = 1;
+    //     }
+    //     core.statusBar.image.toolbox.src = core.statusBar.icons.toolbox.src;
+    //     core.statusBar.image.keyboard.src = core.statusBar.icons.keyboard.src;
+    //     core.statusBar.image.shop.src = core.statusBar.icons.shop.src;
+    //     core.statusBar.image.save.src = core.statusBar.icons.save.src;
+    //     core.statusBar.image.load.src = core.statusBar.icons.load.src;
+    //     core.statusBar.image.settings.src = core.statusBar.icons.settings.src;
+    // }
 }
 
 control.prototype.showStatusBar = function () {
@@ -2493,19 +2496,19 @@ control.prototype.updateHeroIcon = function (name) {
     if (core.statusBar.icons.name == name) return;
     core.statusBar.icons.name = name;
 
-    var image = core.material.images.hero;
-    // 全身图
-    var w = core.material.icons.hero.width || 32;
-    var h = core.material.icons.hero.height || 48;
-    var ratio = Math.min(w / h, 1), width = 32 * ratio, left = 16 - width/2;
+    // var image = core.material.images.hero;
+    // // 全身图
+    // var w = core.material.icons.hero.width || 32;
+    // var h = core.material.icons.hero.height || 48;
+    // var ratio = Math.min(w / h, 1), width = 32 * ratio, left = 16 - width/2;
 
-    var canvas = document.createElement("canvas");
-    var context = canvas.getContext("2d");
-    canvas.width = 32;
-    canvas.height = 32;
-    context.drawImage(image, 0, 0, w, h, left, 0, width, 32);
+    // var canvas = document.createElement("canvas");
+    // var context = canvas.getContext("2d");
+    // canvas.width = 32;
+    // canvas.height = 32;
+    // context.drawImage(image, 0, 0, w, h, left, 0, width, 32);
 
-    core.statusBar.image.name.src = canvas.toDataURL("image/png");
+    // core.statusBar.image.name.src = canvas.toDataURL("image/png");
 }
 
 control.prototype.updateGlobalAttribute = function (name) {
@@ -2568,6 +2571,7 @@ control.prototype.updateGlobalAttribute = function (name) {
 
 ////// 改变工具栏为按钮1-8 //////
 control.prototype.setToolbarButton = function (useButton) {
+    return;
     if (!core.domStyle.showStatusBar) {
         // 隐藏状态栏时检查竖屏
         if (!core.domStyle.isVertical) {

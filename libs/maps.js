@@ -747,10 +747,10 @@ maps.prototype._drawBlockInfo_bgfg = function (blockInfo, name, x, y) {
 ////// 生成groundPattern //////
 maps.prototype.generateGroundPattern = function (floorId) {
     // 生成floorId层的groundPattern（盒子内的怪物动画）
-    var groundId = ((core.status.maps || core.floors)[floorId || core.status.floorId] || {}).defaultGround || "ground";
-    core.material.groundCanvas.clearRect(0, 0, 32, 32);
-    core.material.groundCanvas.drawImage(core.material.images.terrains, 0, 32 * core.material.icons.terrains[groundId], 32, 32, 0, 0, 32, 32);
-    core.material.groundPattern = core.material.groundCanvas.createPattern(core.material.groundCanvas.canvas, 'repeat');
+    // var groundId = ((core.status.maps || core.floors)[floorId || core.status.floorId] || {}).defaultGround || "ground";
+    // core.material.groundCanvas.clearRect(0, 0, 32, 32);
+    // core.material.groundCanvas.drawImage(core.material.images.terrains, 0, 32 * core.material.icons.terrains[groundId], 32, 32, 0, 0, 32, 32);
+    // core.material.groundPattern = core.material.groundCanvas.createPattern(core.material.groundCanvas.canvas, 'repeat');
     // 如果需要用纯色可以直接将下面代码改成改成
     // core.material.groundPattern = '#000000';
 }
@@ -778,6 +778,7 @@ maps.prototype.drawMap = function (floorId, callback) {
 }
 
 maps.prototype._drawMap_drawAll = function (floorId) {
+    return;
     floorId = floorId || core.status.floorId;
     this.drawBg(floorId);
     this.drawEvents(floorId);
@@ -2017,6 +2018,7 @@ maps.prototype._animateBlock_drawList = function (list, opacity) {
 
 ////// 添加一个全局动画 //////
 maps.prototype.addGlobalAnimate = function (block) {
+    return;
     if (!block.event || block.event.animate == null) return;
     if (block.event.cls == 'autotile') {
         var id = block.event.id, img = core.material.images.autotile[id];
@@ -2031,6 +2033,7 @@ maps.prototype.addGlobalAnimate = function (block) {
 
 ////// 删除一个或所有全局动画 //////
 maps.prototype.removeGlobalAnimate = function (x, y, name) {
+    return;
     // 没有定义xy，则全部删除
     if (x == null || y == null) {
         core.status.globalAnimateStatus = 0;
@@ -2066,57 +2069,45 @@ maps.prototype.drawBoxAnimate = function () {
 
 ////// 绘制动画 //////
 maps.prototype.drawAnimate = function (name, x, y, callback) {
-    name = core.getMappedName(name);
+    const animate = core.material.animates[name];
+    const centerX = 32 * x + 16;
+    const centerY = 32 * y + 16;
+    animate.play('event', centerX, centerY, null, callback);
+    // name = core.getMappedName(name);
 
-    // 正在播放录像：不显示动画
-    if (core.isReplaying() || !core.material.animates[name] || x == null || y == null) {
-        if (callback) callback();
-        return -1;
-    }
+    // // 正在播放录像：不显示动画
+    // if (core.isReplaying() || !core.material.animates[name] || x == null || y == null) {
+    //     if (callback) callback();
+    //     return -1;
+    // }
 
-    // 开始绘制
-    var animate = core.material.animates[name], centerX = 32 * x + 16, centerY = 32 * y + 16;
-    // 播放音效
-    core.playSound(animate.se);
+    // // 开始绘制
+    // var animate = core.material.animates[name], centerX = 32 * x + 16, centerY = 32 * y + 16;
+    // // 播放音效
+    // core.playSound(animate.se);
 
-    var id = setTimeout(null);
-    core.status.animateObjs.push({
-        "id": id,
-        "animate": animate,
-        "centerX": centerX,
-        "centerY": centerY,
-        "index": 0,
-        "callback": callback
-    });
+    // var id = setTimeout(null);
+    // core.status.animateObjs.push({
+    //     "id": id,
+    //     "animate": animate,
+    //     "centerX": centerX,
+    //     "centerY": centerY,
+    //     "index": 0,
+    //     "callback": callback
+    // });
 
-    return id;
+    //return id;
 }
 
 ////// 绘制一个跟随勇士的动画 //////
 maps.prototype.drawHeroAnimate = function (name, callback) {
-    name = core.getMappedName(name);
-
-    // 正在播放录像或动画不存在：不显示动画
-    if (core.isReplaying() || !core.material.animates[name]) {
-        if (callback) callback();
-        return -1;
-    }
-
-    // 开始绘制
-    var animate = core.material.animates[name];
-    // 播放音效
-    core.playSound(animate.se);
-
-    var id = setTimeout(null);
-    core.status.animateObjs.push({
-        "id": id,
-        "animate": animate,
-        "hero": true,
-        "index": 0,
-        "callback": callback
-    });
-
-    return id;
+    const animate = core.material.animates[name];
+    const centerX = core.status.heroCenter.px;
+    const centerY = core.status.heroCenter.py;
+    animate.play('event', centerX, centerY, (node) => {
+        node.defaultX = core.status.heroCenter.px;
+        node.defaultY = core.status.heroCenter.py;
+    }, callback);
 }
 
 ////// 绘制动画的某一帧 //////

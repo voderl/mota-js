@@ -93,7 +93,7 @@ function _core() {
         toolbarBtn: false,
     }
     this.bigmap = {
-        canvas: ["bg", "event", "event2", "fg", "damage"],
+        canvas: [],
         offsetX: 0, // in pixel
         offsetY: 0,
         width: this.__SIZE__, // map width and height
