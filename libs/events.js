@@ -82,6 +82,7 @@ events.prototype._startGame_afterStart = function (nowLoc, callback) {
     core.dom.musicBtn.style.display = 'none';
     core.changeFloor(core.firstData.floorId, null, nowLoc, null, function () {
         // 插入一个空事件避免直接回放录像出错
+        pixi.event.emit('startGame');
         core.insertAction([]);
         if (callback) callback();
     });
@@ -572,7 +573,7 @@ events.prototype.changeFloor = function (floorId, stair, heroLoc, time, callback
     floorId = info.floorId;
     info.locked = core.status.lockControl;
 
-    core.dom.floorNameLabel.innerText = core.status.maps[floorId].title;
+    // core.dom.floorNameLabel.innerText = core.status.maps[floorId].title;
     core.lockControl();
     core.stopAutomaticRoute();
     core.clearContinueAutomaticRoute();

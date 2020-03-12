@@ -593,23 +593,16 @@ actions.prototype._sys_onup = function () {
 
 ////// 获得点击事件相对左上角的坐标 //////
 actions.prototype._getClickLoc = function (x, y) {
-
+    const { style } = pixi.resize;
     var statusBar = {'x': 0, 'y': 0};
+
     var size = 32;
-    size = size * core.domStyle.scale;
-
-    if (core.domStyle.isVertical) {
-        statusBar.x = 3;
-        statusBar.y = core.dom.statusBar.offsetHeight + 3;
-    }
-    else {
-        statusBar.x = core.dom.statusBar.offsetWidth + 3;
-        statusBar.y = 3;
-    }
-
-    var left = core.dom.gameGroup.offsetLeft + statusBar.x;
-    var top = core.dom.gameGroup.offsetTop + statusBar.y;
-    var loc = {'x': x - left, 'y': y - top, 'size': size};
+    // size = size * core.domStyle.scale;
+    size *= style.scale;
+    const { offsetLeft , offsetTop } = core.dom.data;
+    // var left = core.dom.gameGroup.offsetLeft + offsetLeft;
+    // var top = core.dom.gameGroup.offsetTop + offsetTop;
+    var loc = {'x': x - offsetLeft, 'y': y - offsetTop, 'size': size};
     return loc;
 }
 

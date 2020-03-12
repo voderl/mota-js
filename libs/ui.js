@@ -1,5 +1,6 @@
 export default ui;
 import {functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a} from '../project/functions'
+import resize from '../../pixi/resize';
 /**
  * ui.js：负责所有和UI界面相关的绘制
  * 包括：
@@ -52,7 +53,6 @@ ui.prototype.clearMap = function (name, x, y, width, height) {
         for (var m in core.canvas) {
             core.canvas[m].clearRect(0, 0, core.bigmap.width*32, core.bigmap.height*32);
         }
-        core.dom.gif.innerHTML = "";
         core.removeGlobalAnimate();
     }
     else {
@@ -454,8 +454,7 @@ ui.prototype.closePanel = function () {
 ui.prototype.clearUI = function () {
     core.status.boxAnimateObjs = [];
     if (core.dymCanvas._selector) core.deleteCanvas("_selector");
-    main.dom.next.style.display = 'none';
-    core.clearMap('ui');
+        core.clearMap('ui');
     core.setAlpha('ui', 1);
 }
 
@@ -1113,14 +1112,10 @@ ui.prototype.drawTextBox = function(content, showAll) {
     });
 
     // Step 6: 绘制光标
-    main.dom.next.style.display = 'block';
-    main.dom.next.style.borderRightColor = main.dom.next.style.borderBottomColor = core.arrayToRGB(textAttribute.text);
-    main.dom.next.style.top = (vPos.bottom - 20) * core.domStyle.scale + "px";
-    var left = (hPos.left + hPos.right) / 2;
+                var left = (hPos.left + hPos.right) / 2;
     if (pInfo.position == 'up' && !pInfo.noPeak && pInfo.px != null && Math.abs(pInfo.px * 32 + 16 - left) < 50)
         left = hPos.right - 64;
-    main.dom.next.style.left = left * core.domStyle.scale + "px";
-    return config;
+        return config;
 }
 
 ui.prototype._drawTextBox_drawImages = function (content) {
@@ -2888,14 +2883,16 @@ ui.prototype.createCanvas = function (name, x, y, width, height, z) {
     newCanvas.height = height;
     newCanvas.setAttribute("_left", x);
     newCanvas.setAttribute("_top", y);
-    newCanvas.style.width = width * core.domStyle.scale + 'px';
-    newCanvas.style.height = height * core.domStyle.scale + 'px';
-    newCanvas.style.left = x * core.domStyle.scale + 'px';
-    newCanvas.style.top = y * core.domStyle.scale + 'px';
     newCanvas.style.zIndex = z;
-    newCanvas.style.position = 'absolute';
+    resize.reLocDymCanvas(newCanvas);
+    // newCanvas.style.width = width * core.domStyle.scale + 'px';
+    // newCanvas.style.height = height * core.domStyle.scale + 'px';
+    // newCanvas.style.left = x * core.domStyle.scale + 'px';
+    // newCanvas.style.top = y * core.domStyle.scale + 'px';
+    
+    // newCanvas.style.position = 'absolute';
     core.dymCanvas[name] = newCanvas.getContext('2d');
-    core.dom.gameDraw.appendChild(newCanvas);
+    main.dom.body.appendChild(newCanvas);
     return core.dymCanvas[name];
 }
 
@@ -2903,13 +2900,10 @@ ui.prototype.createCanvas = function (name, x, y, width, height, z) {
 ui.prototype.relocateCanvas = function (name, x, y) {
     var ctx = core.getContextByName(name);
     if (!ctx) return null;
-    if (x != null) {
-        ctx.canvas.style.left = x * core.domStyle.scale + 'px';
+    if (x != null || y != null) {
         ctx.canvas.setAttribute("_left", x);
-    }
-    if (y != null) {
-        ctx.canvas.style.top = y * core.domStyle.scale + 'px';
         ctx.canvas.setAttribute("_top", y);
+        resize.reLocDymCanvas(ctx);
     }
     return ctx;
 }
@@ -2918,27 +2912,25 @@ ui.prototype.relocateCanvas = function (name, x, y) {
 ui.prototype.resizeCanvas = function (name, width, height, styleOnly) {
     var ctx = core.getContextByName(name);
     if (!ctx) return null;
-    if (width != null) {
-        if (!styleOnly) ctx.canvas.width = width;
-        ctx.canvas.style.width = width * core.domStyle.scale + 'px';
-    }
-    if (height != null) {
-        if (!styleOnly) ctx.canvas.height = height;
-        ctx.canvas.style.height = height * core.domStyle.scale + 'px';
+    if (width != null || height != null) {
+        if (!styleOnly) {
+            ctx.canvas.width = width;
+            ctx.canvas.height = height;
+        }
+        resize.reLocDymCanvas(ctx);
     }
     return ctx;
 }
 ////// canvas删除 //////
 ui.prototype.deleteCanvas = function (name) {
     if (!core.dymCanvas[name]) return null;
-    core.dom.gameDraw.removeChild(core.dymCanvas[name].canvas);
+    main.dom.body.removeChild(core.dymCanvas[name].canvas);
     delete core.dymCanvas[name];
 }
 
 ////// 删除所有动态canvas //////
 ui.prototype.deleteAllCanvas = function () {
     Object.keys(core.dymCanvas).forEach(function (name) {
-        core.dom.gameDraw.removeChild(core.dymCanvas[name].canvas);
-        delete core.dymCanvas[name];
+        this.deleteCanvas(name);
     });
 }

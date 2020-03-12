@@ -49,6 +49,7 @@ export var functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a =
 		core.showStatusBar();
 	// 隐藏右下角的音乐按钮
 	core.dom.musicBtn.style.display = 'none';
+	pixi.event.emit('resetGame');
 },
         "setInitData": function () {
 	// 不同难度分别设置初始属性

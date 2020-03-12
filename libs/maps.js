@@ -1704,69 +1704,49 @@ maps.prototype.resetMap = function (floorId) {
 
 ////// 初始化独立的block canvas //////
 maps.prototype._initDetachedBlock = function (blockInfo, x, y, displayDamage) {
-    var headCanvas = null, bodyCanvas = '__body_' + x + "_" + y, damageCanvas = null;
-    // head
-    if (blockInfo.height > 32) {
-        headCanvas = "__head_" + x + "_" + y;
-        core.createCanvas(headCanvas, 0, 0, 32, blockInfo.height - 32, 55);
-    }
-    // body
-    core.createCanvas(bodyCanvas, 0, 0, 32, 32, 35);
-    // damage
-    var damage = null, damageColor = null;
-    if (blockInfo.cls.indexOf('enemy') == 0 && core.hasItem('book') && displayDamage) {
-        var damageString = core.enemys.getDamageString(blockInfo.id, x, y);
-        damage = damageString.damage;
-        damageColor = damageString.color;
-    }
-    if (damage != null) {
-        damageCanvas = "__damage_" + x + "_" + y;
-        var ctx = core.createCanvas(damageCanvas, 0, 0, 32, 32, 65);
-        ctx.textAlign = 'left';
-        ctx.font = "bold 11px Arial";
-        core.fillBoldText(ctx, damage, 1, 31, damageColor);
-        if (core.flags.displayCritical) {
-            var critical = core.enemys.nextCriticals(blockInfo.id);
-            if (critical.length > 0) critical = critical[0];
-            critical = core.formatBigNumber(critical[0], true);
-            if (critical == '???') critical = '?';
-            core.fillBoldText(ctx, critical, 1, 21, '#FFFFFF');
-        }
-    }
+    const event = pixi.game.getScene('event');
+    const damage = pixi.game.getScene('damage');
+    const block = pixi.Block.get(blockInfo.number, x, y);
+    const node = block.drawTo(event);
+    const shouldDisplayDamage = blockInfo.cls.indexOf('enemy') == 0 && core.hasItem('book') && displayDamage;
+    let damageNode = shouldDisplayDamage ? pixi.maps.drawOneDamage(damage, block.id, x, y) : null;
     return {
-        "headCanvas": headCanvas,
-        "bodyCanvas": bodyCanvas,
-        "damageCanvas": damageCanvas
+        "mainNode": node,
+        "damageNode": damageNode
     }
 }
 
 ////// 移动独立的block canvas //////
 maps.prototype._moveDetachedBlock = function (blockInfo, nowX, nowY, opacity, canvases) {
     var height = blockInfo.height, posX = blockInfo.posX, posY = blockInfo.posY, image = blockInfo.image;
-    var headCanvas = canvases.headCanvas, bodyCanvas = canvases.bodyCanvas, damageCanvas = canvases.damageCanvas;
-    if (headCanvas) {
-        core.dymCanvas[headCanvas].clearRect(0, 0, 32, height);
-        core.dymCanvas[headCanvas].drawImage(image, posX * 32, posY * height, 32, height - 32, 0, 0, 32, height - 32);
-        core.relocateCanvas(headCanvas, nowX - core.bigmap.offsetX, nowY + 32 - height - core.bigmap.offsetY);
-        core.setOpacity(headCanvas, opacity);
+    const { mainNode, damageNode } = canvases;
+    if (mainNode) {
+        mainNode.position.set(nowX - core.bigmap.offsetX, nowY + 32 - mainNode.height- core.bigmap.offsetY);
+        mainNode.alpha = opacity;
+        // core.dymCanvas[headCanvas].clearRect(0, 0, 32, height);
+        // core.dymCanvas[headCanvas].drawImage(image, posX * 32, posY * height, 32, height - 32, 0, 0, 32, height - 32);
+        // core.relocateCanvas(headCanvas, nowX - core.bigmap.offsetX, nowY + 32 - height - core.bigmap.offsetY);
+       //  core.setOpacity(headCanvas, opacity);
     }
-    if (bodyCanvas) {
-        core.dymCanvas[bodyCanvas].clearRect(0, 0, 32, 32);
-        core.dymCanvas[bodyCanvas].drawImage(image, posX * 32, posY * height + height - 32, 32, 32, 0, 0, 32, 32);
-        core.relocateCanvas(bodyCanvas, nowX - core.bigmap.offsetX, nowY - core.bigmap.offsetY);
-        core.setOpacity(bodyCanvas, opacity);
-    }
-    if (damageCanvas) {
-        core.relocateCanvas(damageCanvas, nowX - core.bigmap.offsetX, nowY - core.bigmap.offsetY);
-        core.setOpacity(damageCanvas, opacity);
+    // if (bodyCanvas) {
+    //     core.dymCanvas[bodyCanvas].clearRect(0, 0, 32, 32);
+    //     core.dymCanvas[bodyCanvas].drawImage(image, posX * 32, posY * height + height - 32, 32, 32, 0, 0, 32, 32);
+    //     core.relocateCanvas(bodyCanvas, nowX - core.bigmap.offsetX, nowY - core.bigmap.offsetY);
+    //     core.setOpacity(bodyCanvas, opacity);
+    // }
+    if (damageNode) {
+        // core.relocateCanvas(damageCanvas, nowX - core.bigmap.offsetX, nowY - core.bigmap.offsetY);
+        // core.setOpacity(damageCanvas, opacity);
+        damageNode.position.set(nowX - core.bigmap.offsetX, nowY - core.bigmap.offsetY);
+        damageNode.alpha = opacity;
     }
 }
 
 ////// 删除独立的block canvas //////
 maps.prototype._deleteDetachedBlock = function (canvases) {
-    core.deleteCanvas(canvases.headCanvas);
-    core.deleteCanvas(canvases.bodyCanvas);
-    core.deleteCanvas(canvases.damageCanvas);
+    const { mainNode, damageNode } = canvases;
+    if (mainNode) mainNode.remove();
+    if (damageNode) damageNode.remove();
 }
 
 maps.prototype._getAndRemoveBlock = function (x, y) {
@@ -1781,7 +1761,7 @@ maps.prototype._getAndRemoveBlock = function (x, y) {
 
 ////// 显示移动某块的动画，达到{“type”:”move”}的效果 //////
 maps.prototype.moveBlock = function (x, y, steps, time, keep, callback) {
-    // TODO: 移动动画图块而不是一点点移动
+    // TODO: 当同时有两个阻击，会卡掉一个
     time = time || 500;
     var blockArr = this._getAndRemoveBlock(x, y);
     if (blockArr == null) {

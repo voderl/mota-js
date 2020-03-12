@@ -244,8 +244,8 @@ _core.prototype._init_flags = function () {
     core.firstData = core.clone(core.data.firstData);
     this._init_sys_flags();
 
-    core.dom.versionLabel.innerText = core.firstData.version;
-    core.dom.logoLabel.innerText = core.firstData.title;
+    // core.dom.versionLabel.innerText = core.firstData.version;
+    // core.dom.logoLabel.innerText = core.firstData.title;
     document.title = core.firstData.title + " - HTML5魔塔";
     document.getElementById("startLogo").innerText = core.firstData.title;
     (core.firstData.shops||[]).forEach(function (t) { core.initStatus.shops[t.id] = t; });

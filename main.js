@@ -67,27 +67,28 @@ function _main() {
         'replayGame': document.getElementById('replayGame'),
         'levelChooseButtons': document.getElementById('levelChooseButtons'),
         'data': document.getElementById('data'),
+        'ui': document.getElementById('ui'),
         'statusLabels': document.getElementsByClassName('statusLabel'),
         'statusTexts': document.getElementsByClassName('statusText'),
-        'floorCol': document.getElementById('floorCol'),
-        'nameCol': document.getElementById('nameCol'),
-        'lvCol': document.getElementById('lvCol'),
-        'hpmaxCol': document.getElementById('hpmaxCol'),
-        'hpCol': document.getElementById('hpCol'),
-        'manaCol': document.getElementById('manaCol'),
-        'atkCol': document.getElementById('atkCol'),
-        'defCol': document.getElementById('defCol'),
-        'mdefCol': document.getElementById('mdefCol'),
-        'moneyCol': document.getElementById('moneyCol'),
-        'experienceCol': document.getElementById('experienceCol'),
-        'upCol': document.getElementById('upCol'),
-        'keyCol': document.getElementById('keyCol'),
-        'pzfCol': document.getElementById('pzfCol'),
-        'debuffCol': document.getElementById('debuffCol'),
-        'skillCol': document.getElementById('skillCol'),
-        'hard': document.getElementById('hard'),
-        'statusCanvas': document.getElementById('statusCanvas'),
-        'statusCanvasCtx': document.getElementById('statusCanvas').getContext('2d'),
+        // 'floorCol': document.getElementById('floorCol'),
+        // 'nameCol': document.getElementById('nameCol'),
+        // 'lvCol': document.getElementById('lvCol'),
+        // 'hpmaxCol': document.getElementById('hpmaxCol'),
+        // 'hpCol': document.getElementById('hpCol'),
+        // 'manaCol': document.getElementById('manaCol'),
+        // 'atkCol': document.getElementById('atkCol'),
+        // 'defCol': document.getElementById('defCol'),
+        // 'mdefCol': document.getElementById('mdefCol'),
+        // 'moneyCol': document.getElementById('moneyCol'),
+        // 'experienceCol': document.getElementById('experienceCol'),
+        // 'upCol': document.getElementById('upCol'),
+        // 'keyCol': document.getElementById('keyCol'),
+        // 'pzfCol': document.getElementById('pzfCol'),
+        // 'debuffCol': document.getElementById('debuffCol'),
+        // 'skillCol': document.getElementById('skillCol'),
+        // 'hard': document.getElementById('hard'),
+        // 'statusCanvas': document.getElementById('statusCanvas'),
+        // 'statusCanvasCtx': document.getElementById('statusCanvas').getContext('2d'),
         'inputDiv': document.getElementById('inputDiv'),
         'inputMessage': document.getElementById('inputMessage'),
         'inputBox': document.getElementById('inputBox'),
@@ -309,7 +310,7 @@ _main.prototype.loadMod = function (dir, modName, callback, onerror) {
 _main.prototype.loadFloors = function (callback) {
 
     // 加载js
-    main.setMainTipsText('正在加载楼层文件...')
+    this.setMainTipsText('正在加载楼层文件...')
     if (this.useCompress) { // 读取压缩文件
         var script = document.createElement('script');
         script.src = 'project/floors.min.js?v=' + this.version;
@@ -346,6 +347,7 @@ _main.prototype.loadFloor = function(floorId, callback) {
 
 ////// 加载过程提示 //////
 _main.prototype.setMainTipsText = function (text) {
+    return;
     main.dom.mainTips.innerHTML = text;
 }
 
@@ -548,226 +550,226 @@ main.dom.data.ontouchend = function (e) {
     }
 }
 
-main.dom.statusCanvas.onclick = function (e) {
-    try {
-        e.preventDefault();
-        main.core.onStatusBarClick(e);
-    } catch (e) {
-        main.log(e);
-    }
-}
+// main.dom.statusCanvas.onclick = function (e) {
+//     try {
+//         e.preventDefault();
+//         main.core.onStatusBarClick(e);
+//     } catch (e) {
+//         main.log(e);
+//     }
+// }
 
-////// 点击状态栏中的怪物手册时 //////
-main.statusBar.image.book.onclick = function (e) {
-    e.stopPropagation();
+// ////// 点击状态栏中的怪物手册时 //////
+// main.statusBar.image.book.onclick = function (e) {
+//     e.stopPropagation();
 
-    if (core.isReplaying()) {
-        core.triggerReplay();
-        return;
-    }
+//     if (core.isReplaying()) {
+//         core.triggerReplay();
+//         return;
+//     }
 
-    if (main.core.isPlaying() && (core.status.event||{}).id=='paint') {
-        core.actions.setPaintMode('paint');
-        return;
-    }
+//     if (main.core.isPlaying() && (core.status.event||{}).id=='paint') {
+//         core.actions.setPaintMode('paint');
+//         return;
+//     }
 
-    if (main.core.isPlaying())
-        main.core.openBook(true);
-}
+//     if (main.core.isPlaying())
+//         main.core.openBook(true);
+// }
 
-////// 点击状态栏中的楼层传送器/装备栏时 //////
-main.statusBar.image.fly.onclick = function (e) {
-    e.stopPropagation();
+// ////// 点击状态栏中的楼层传送器/装备栏时 //////
+// main.statusBar.image.fly.onclick = function (e) {
+//     e.stopPropagation();
 
-    // 播放录像时
-    if (core.isReplaying()) {
-        core.stopReplay();
-        return;
-    }
+//     // 播放录像时
+//     if (core.isReplaying()) {
+//         core.stopReplay();
+//         return;
+//     }
 
-    // 绘图模式
-    if (main.core.isPlaying() && (core.status.event||{}).id=='paint') {
-        core.actions.setPaintMode('erase');
-        return;
-    }
+//     // 绘图模式
+//     if (main.core.isPlaying() && (core.status.event||{}).id=='paint') {
+//         core.actions.setPaintMode('erase');
+//         return;
+//     }
 
-    if (main.core.isPlaying()) {
-        if (!main.core.flags.equipboxButton) {
-            main.core.useFly(true);
-        }
-        else {
-            main.core.openEquipbox(true)
-        }
-    }
-}
+//     if (main.core.isPlaying()) {
+//         if (!main.core.flags.equipboxButton) {
+//             main.core.useFly(true);
+//         }
+//         else {
+//             main.core.openEquipbox(true)
+//         }
+//     }
+// }
 
-////// 点击状态栏中的工具箱时 //////
-main.statusBar.image.toolbox.onclick = function (e) {
-    e.stopPropagation();
+// ////// 点击状态栏中的工具箱时 //////
+// main.statusBar.image.toolbox.onclick = function (e) {
+//     e.stopPropagation();
 
-    if (core.isReplaying()) {
-        core.rewindReplay();
-        return;
-    }
+//     if (core.isReplaying()) {
+//         core.rewindReplay();
+//         return;
+//     }
 
-    if (main.core.isPlaying() && (core.status.event||{}).id=='paint') {
-        core.actions.clearPaint();
-        return;
-    }
+//     if (main.core.isPlaying() && (core.status.event||{}).id=='paint') {
+//         core.actions.clearPaint();
+//         return;
+//     }
 
-    if (main.core.isPlaying()) {
-        main.core.openToolbox(core.status.event.id != 'equipbox');
-    }
-}
+//     if (main.core.isPlaying()) {
+//         main.core.openToolbox(core.status.event.id != 'equipbox');
+//     }
+// }
 
-////// 双击状态栏中的工具箱时 //////
-main.statusBar.image.toolbox.ondblclick = function (e) {
-    e.stopPropagation();
+// ////// 双击状态栏中的工具箱时 //////
+// main.statusBar.image.toolbox.ondblclick = function (e) {
+//     e.stopPropagation();
 
-    if (core.isReplaying()) {
-        return;
-    }
+//     if (core.isReplaying()) {
+//         return;
+//     }
 
-    if (main.core.isPlaying())
-        main.core.openEquipbox(true);
+//     if (main.core.isPlaying())
+//         main.core.openEquipbox(true);
 
-}
+// }
 
-////// 点击状态栏中的虚拟键盘时 //////
-main.statusBar.image.keyboard.onclick = function (e) {
-    e.stopPropagation();
+// ////// 点击状态栏中的虚拟键盘时 //////
+// main.statusBar.image.keyboard.onclick = function (e) {
+//     e.stopPropagation();
 
-    if (core.isReplaying()) {
-        core.bookReplay();
-        return;
-    }
+//     if (core.isReplaying()) {
+//         core.bookReplay();
+//         return;
+//     }
 
-    if (main.core.isPlaying())
-        main.core.openKeyBoard(true);
-}
+//     if (main.core.isPlaying())
+//         main.core.openKeyBoard(true);
+// }
 
-////// 点击状态栏中的快捷商店键盘时 //////
-main.statusBar.image.shop.onclick = function (e) {
-    e.stopPropagation();
+// ////// 点击状态栏中的快捷商店键盘时 //////
+// main.statusBar.image.shop.onclick = function (e) {
+//     e.stopPropagation();
 
-    if (core.isReplaying()) {
-        core.viewMapReplay();
-        return;
-    }
+//     if (core.isReplaying()) {
+//         core.viewMapReplay();
+//         return;
+//     }
 
-    if (main.core.isPlaying())
-        main.core.openQuickShop(true);
-}
+//     if (main.core.isPlaying())
+//         main.core.openQuickShop(true);
+// }
 
-////// 点击金币时也可以开启虚拟键盘 //////
-main.statusBar.image.money.onclick = function (e) {
-    e.stopPropagation();
+// ////// 点击金币时也可以开启虚拟键盘 //////
+// main.statusBar.image.money.onclick = function (e) {
+//     e.stopPropagation();
 
-    if (main.core.isPlaying())
-        main.core.openQuickShop(true);
-}
+//     if (main.core.isPlaying())
+//         main.core.openQuickShop(true);
+// }
 
-////// 点击状态栏中的存档按钮时 //////
-main.statusBar.image.save.onclick = function (e) {
-    e.stopPropagation();
+// ////// 点击状态栏中的存档按钮时 //////
+// main.statusBar.image.save.onclick = function (e) {
+//     e.stopPropagation();
 
-    if (core.isReplaying()) {
-        core.speedDownReplay();
-        return;
-    }
+//     if (core.isReplaying()) {
+//         core.speedDownReplay();
+//         return;
+//     }
 
-    if (main.core.isPlaying() && (core.status.event||{}).id=='paint') {
-        core.actions.savePaint();
-        return;
-    }
+//     if (main.core.isPlaying() && (core.status.event||{}).id=='paint') {
+//         core.actions.savePaint();
+//         return;
+//     }
 
-    if (main.core.isPlaying())
-        main.core.save(true);
-}
+//     if (main.core.isPlaying())
+//         main.core.save(true);
+// }
 
-////// 点击状态栏中的读档按钮时 //////
-main.statusBar.image.load.onclick = function (e) {
-    e.stopPropagation();
+// ////// 点击状态栏中的读档按钮时 //////
+// main.statusBar.image.load.onclick = function (e) {
+//     e.stopPropagation();
 
-    if (core.isReplaying()) {
-        core.speedUpReplay();
-        return;
-    }
+//     if (core.isReplaying()) {
+//         core.speedUpReplay();
+//         return;
+//     }
 
-    if (main.core.isPlaying() && (core.status.event||{}).id=='paint') {
-        core.actions.loadPaint();
-        return;
-    }
+//     if (main.core.isPlaying() && (core.status.event||{}).id=='paint') {
+//         core.actions.loadPaint();
+//         return;
+//     }
 
-    if (main.core.isPlaying())
-        main.core.load(true);
-}
+//     if (main.core.isPlaying())
+//         main.core.load(true);
+// }
 
-////// 点击状态栏中的系统菜单时 //////
-main.statusBar.image.settings.onclick = function (e) {
-    e.stopPropagation();
+// ////// 点击状态栏中的系统菜单时 //////
+// main.statusBar.image.settings.onclick = function (e) {
+//     e.stopPropagation();
 
-    if (core.isReplaying()) {
-        core.saveReplay();
-        return;
-    }
+//     if (core.isReplaying()) {
+//         core.saveReplay();
+//         return;
+//     }
 
-    if (main.core.isPlaying() && (core.status.event||{}).id=='paint') {
-        core.actions.exitPaint();
-        return;
-    }
+//     if (main.core.isPlaying() && (core.status.event||{}).id=='paint') {
+//         core.actions.exitPaint();
+//         return;
+//     }
 
-    if (main.core.isPlaying())
-        main.core.openSettings(true);
-}
+//     if (main.core.isPlaying())
+//         main.core.openSettings(true);
+// }
 
-////// 点击工具栏时 //////
-main.dom.hard.onclick = function () {
-    if (core.isReplaying())
-        return;
-    main.core.control.setToolbarButton(!core.domStyle.toolbarBtn);
-}
+// ////// 点击工具栏时 //////
+// main.dom.hard.onclick = function () {
+//     if (core.isReplaying())
+//         return;
+//     main.core.control.setToolbarButton(!core.domStyle.toolbarBtn);
+// }
 
-////// 手机端的按钮1-7 //////
-main.statusBar.image.btn1.onclick = function (e) {
-    e.stopPropagation();
-    main.core.onkeyUp({"keyCode": 49});
-};
+// ////// 手机端的按钮1-7 //////
+// main.statusBar.image.btn1.onclick = function (e) {
+//     e.stopPropagation();
+//     main.core.onkeyUp({"keyCode": 49});
+// };
 
-main.statusBar.image.btn2.onclick = function (e) {
-    e.stopPropagation();
-    main.core.onkeyUp({"keyCode": 50});
-};
+// main.statusBar.image.btn2.onclick = function (e) {
+//     e.stopPropagation();
+//     main.core.onkeyUp({"keyCode": 50});
+// };
 
-main.statusBar.image.btn3.onclick = function (e) {
-    e.stopPropagation();
-    main.core.onkeyUp({"keyCode": 51});
-};
+// main.statusBar.image.btn3.onclick = function (e) {
+//     e.stopPropagation();
+//     main.core.onkeyUp({"keyCode": 51});
+// };
 
-main.statusBar.image.btn4.onclick = function (e) {
-    e.stopPropagation();
-    main.core.onkeyUp({"keyCode": 52});
-};
+// main.statusBar.image.btn4.onclick = function (e) {
+//     e.stopPropagation();
+//     main.core.onkeyUp({"keyCode": 52});
+// };
 
-main.statusBar.image.btn5.onclick = function (e) {
-    e.stopPropagation();
-    main.core.onkeyUp({"keyCode": 53});
-};
+// main.statusBar.image.btn5.onclick = function (e) {
+//     e.stopPropagation();
+//     main.core.onkeyUp({"keyCode": 53});
+// };
 
-main.statusBar.image.btn6.onclick = function (e) {
-    e.stopPropagation();
-    main.core.onkeyUp({"keyCode": 54});
-};
+// main.statusBar.image.btn6.onclick = function (e) {
+//     e.stopPropagation();
+//     main.core.onkeyUp({"keyCode": 54});
+// };
 
-main.statusBar.image.btn7.onclick = function (e) {
-    e.stopPropagation();
-    main.core.onkeyUp({"keyCode": 55});
-};
+// main.statusBar.image.btn7.onclick = function (e) {
+//     e.stopPropagation();
+//     main.core.onkeyUp({"keyCode": 55});
+// };
 
-main.statusBar.image.btn8.onclick = function (e) {
-    e.stopPropagation();
-    main.core.onkeyUp({"keyCode": 56});
-};
+// main.statusBar.image.btn8.onclick = function (e) {
+//     e.stopPropagation();
+//     main.core.onkeyUp({"keyCode": 56});
+// };
 
 ////// 点击“开始游戏”时 //////
 main.dom.playGame.onclick = function () {

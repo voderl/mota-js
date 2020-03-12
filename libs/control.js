@@ -40,12 +40,12 @@ control.prototype._init = function () {
     this.registerReplayAction("moveDirectly", this._replayAction_moveDirectly);
     this.registerReplayAction("key", this._replayAction_key);
     // --- 注册系统的resize
-    this.registerResize("gameGroup", this._resize_gameGroup);
-    this.registerResize("canvas", this._resize_canvas);
-    this.registerResize("statusBar", this._resize_statusBar);
-    this.registerResize("status", this._resize_status);
-    this.registerResize("toolBar", this._resize_toolBar);
-    this.registerResize("tools", this._resize_tools);
+    // this.registerResize("gameGroup", this._resize_gameGroup);
+    // this.registerResize("canvas", this._resize_canvas);
+    // this.registerResize("statusBar", this._resize_statusBar);
+    // this.registerResize("status", this._resize_status);
+    // this.registerResize("toolBar", this._resize_toolBar);
+    // this.registerResize("tools", this._resize_tools);
 }
 
 // ------ requestAnimationFrame 相关 ------ //
@@ -462,12 +462,14 @@ control.prototype.continueAutomaticRoute = function () {
 
 ////// 清空剩下的自动寻路列表 //////
 control.prototype.clearContinueAutomaticRoute = function (callback) {
+    //TODO
     core.deleteCanvas('route');
     core.status.automaticRoute.moveStepBeforeStop=[];
     if (callback) callback();
 }
 
 ////// 显示离散的寻路点 //////
+// TODO
 control.prototype.fillPosWithPoint = function (pos) {
     core.fillRect('ui', pos.x*32+12,pos.y*32+12,8,8, '#bfbfbf');
 }
@@ -541,6 +543,8 @@ control.prototype._setAutomaticRoute_clickMoveDirectly = function (destX, destY,
 
 control.prototype._setAutomaticRoute_drawRoute = function (moveStep) {
     // 计算绘制区域的宽高，并尽可能小的创建route层
+    // TODO
+    pixi.ui.drawRoute(moveStep);
     var sx = core.bigmap.width * 32, sy = core.bigmap.height * 32, dx = 0, dy = 0;
     moveStep.forEach(function (t) {
         sx = Math.min(sx, t.x * 32); dx = Math.max(dx, t.x * 32);
@@ -814,7 +818,6 @@ control.prototype.drawHero = function (status, offset) {
     core.bigmap.offsetX = core.clamp((x - core.__HALF_SIZE__) * 32 + offsetX, 0, 32*core.bigmap.width-core.__PIXELS__);
     core.bigmap.offsetY = core.clamp((y - core.__HALF_SIZE__) * 32 + offsetY, 0, 32*core.bigmap.height-core.__PIXELS__);
     core.clearAutomaticRouteNode(x+dx, y+dy);
-    core.clearMap('hero');
     core.status.heroCenter.px = 32 * x + offsetX + 16;
     core.status.heroCenter.py = 32 * y + offsetY + 32 - core.material.icons.hero.height / 2;
     const heroSprite = core.status.heroSprite;
@@ -2405,10 +2408,11 @@ control.prototype.checkBgm = function() {
 
 ////// 清空状态栏 //////
 control.prototype.clearStatusBar = function() {
-    Object.keys(core.statusBar).forEach(function (e) {
-        if (core.statusBar[e].innerHTML != null)
-            core.statusBar[e].innerHTML = "&nbsp;";
-    })
+    return;
+    // Object.keys(core.statusBar).forEach(function (e) {
+    //     if (core.statusBar[e].innerHTML != null)
+    //         core.statusBar[e].innerHTML = "&nbsp;";
+    // })
     core.statusBar.image.book.style.opacity = 0.3;
     if (!core.flags.equipboxButton)
         core.statusBar.image.fly.style.opacity = 0.3;
@@ -2521,20 +2525,21 @@ control.prototype.updateGlobalAttribute = function (name) {
     }
     var attribute = core.status.globalAttribute || core.initStatus.globalAttribute;
     if (attribute == null) return;
+    return;
     switch (name) {
         case 'statusLeftBackground':
             if (!core.domStyle.isVertical) {
-                core.dom.statusBar.style.background = attribute[name];
+                // core.dom.statusBar.style.background = attribute[name];
             }
             break;
         case 'statusTopBackground':
             if (core.domStyle.isVertical) {
-                core.dom.statusBar.style.background = attribute[name];
+                // core.dom.statusBar.style.background = attribute[name];
             }
             break;
         case 'toolsBackground':
             if (core.domStyle.isVertical) {
-                core.dom.toolBar.style.background = attribute[name];
+                // core.dom.toolBar.style.background = attribute[name];
             }
             break;
         case 'borderColor':
