@@ -1,6 +1,7 @@
 export default events;
 import {functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a} from '../project/functions'
 import {events_c12a15a8_c380_4b28_8144_256cba95f760} from '../project/events'
+import route from '../../pixi/scenes/route';
 "use strict";
 
 function events() {
@@ -24,15 +25,15 @@ events.prototype.resetGame = function (hero, hard, floorId, maps, values) {
 
 ////// 游戏开始事件 //////
 events.prototype.startGame = function (hard, seed, route, callback) {
-    main.dom.levelChooseButtons.style.display = 'none';
-    main.dom.startButtonGroup.style.display = 'none';
+    // main.dom.levelChooseButtons.style.display = 'none';
+    // main.dom.startButtonGroup.style.display = 'none';
     hard = hard || "";
 
     if (main.mode != 'play') return;
 
     // 无动画的开始游戏
     if (core.flags.startUsingCanvas || route != null) {
-        core.dom.startPanel.style.display = 'none';
+        // core.dom.startPanel.style.display = 'none';
         this._startGame_start(hard, seed, route, callback);
     }
     else {
@@ -333,7 +334,7 @@ events.prototype._trigger = function (x, y) {
 
     if (block.event.trigger) {
         var noPass = block.event.noPass, trigger = block.event.trigger;
-        if (noPass) core.clearAutomaticRouteNode(x, y);
+        if (noPass) route.clear();
 
         // 转换楼层能否穿透
         if (trigger == 'changeFloor' && !noPass && this._trigger_ignoreChangeFloor(block))

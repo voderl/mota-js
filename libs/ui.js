@@ -1,6 +1,7 @@
 export default ui;
 import {functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a} from '../project/functions'
 import resize from '../../pixi/resize';
+import tip from '../../pixi/scenes/tip';
 /**
  * ui.js：负责所有和UI界面相关的绘制
  * 包括：
@@ -460,52 +461,7 @@ ui.prototype.clearUI = function () {
 
 ////// 左上角绘制一段提示 //////
 ui.prototype.drawTip = function (text, id, clear) {
-    this.clearTip();
-    var one = {
-        text: text,
-        textX: 21,
-        width: 26 + core.calWidth('data', text, "16px Arial"),
-        opacity: 0.1,
-        stage: 1,
-        time: 0
-    };
-    if (id != null) {
-        var info = core.getBlockInfo(id);
-        if (info == null || !info.image) {
-            // 检查状态栏图标
-            if (core.statusBar.icons[id] instanceof Image) {
-                id = {image: core.statusBar.icons[id], posX: 0, posY: 0, height: 32};
-            }
-            else info = null;
-        }
-        if (info != null) {
-            one.image = info.image;
-            one.posX = info.posX;
-            one.posY = info.posY;
-            one.height = info.height;
-            one.textX += 24;
-            one.width += 24;
-        }
-    }
-    core.animateFrame.tips.list.push(one);
-    if (core.animateFrame.tips.list.length > 3) {
-        core.animateFrame.tips.list.shift();
-    }
-}
-
-ui.prototype._drawTip_drawOne = function (one, offset) {
-    core.setAlpha('data', one.opacity);
-    core.fillRect('data', 5, offset+ 5, one.width, 42, '#000000');
-    if (one.image)
-        core.drawImage('data', one.image, one.posX * 32, one.posY * one.height, 32, 32, 10, offset + 10, 32, 32);
-    core.fillText('data', one.text, one.textX, offset + 33, '#FFFFFF');
-    core.setAlpha('data', 1);
-}
-
-ui.prototype.clearTip = function () {
-    core.animateFrame.tips.list = [];
-    core.animateFrame.tips.offset = 0;
-    core.animateFrame.tips.lastSize = 0;
+    return tip.draw(text, id);
 }
 
 ////// 地图中间绘制一段文字 //////
@@ -2038,7 +1994,6 @@ ui.prototype.drawMaps = function (index, x, y) {
     core.status.event.id = 'viewMaps';
     this.clearUI();
     if (index == null) return this._drawMaps_drawHint();
-    core.clearTip();
     core.status.checkBlock.cache = {};
     var data = this._drawMaps_buildData(index, x, y);
     core.drawThumbnail(data.floorId, null, {damage: data.damage},
@@ -2930,7 +2885,7 @@ ui.prototype.deleteCanvas = function (name) {
 
 ////// 删除所有动态canvas //////
 ui.prototype.deleteAllCanvas = function () {
-    Object.keys(core.dymCanvas).forEach(function (name) {
+    Object.keys(core.dymCanvas).forEach((name) => {
         this.deleteCanvas(name);
     });
 }

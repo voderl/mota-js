@@ -1,6 +1,8 @@
 export default maps;
 import {maps_90f36752_8815_4be8_b32b_d7fad1d0542e} from '../project/maps'
 import PriorityQueue from './thirdparty/priority-queue.min.js'
+import utils from '../../pixi/utils';
+import nodes from '../../pixi/nodes';
 "use strict";
 
 function maps() {
@@ -1207,9 +1209,12 @@ maps.prototype._drawThumbnail_drawTempCanvas = function (floorId, blocks, option
     // 绘制到tempCanvas上面
     var tempCanvas = core.bigmap.tempCanvas;
     var tempWidth = width * 32, tempHeight = height * 32;
-    tempCanvas.canvas.width = tempWidth;
-    tempCanvas.canvas.height = tempHeight;
-    tempCanvas.clearRect(0, 0, tempWidth, tempHeight);
+    const render = pixi.canvasRenderer;
+    render.resize(tempWidth, tempHeight);
+    const node = nodes.getNode('sprite');
+    //  tempCanvas.canvas.width = tempWidth;
+    //  tempCanvas.canvas.height = tempHeight;
+    //  tempCanvas.clearRect(0, 0, tempWidth, tempHeight);
 
     // --- 暂存 flags
     var hasHero = core.status.hero != null, flags = null;
@@ -1219,32 +1224,41 @@ maps.prototype._drawThumbnail_drawTempCanvas = function (floorId, blocks, option
         core.status.hero.flags = options.flags;
     }
 
-    this._drawThumbnail_realDrawTempCanvas(floorId, blocks, options, tempCanvas);
-
+    this._drawThumbnail_realDrawTempCanvas(floorId, blocks, options, node);
+    node.getBounds();
+    node.renderCanvas(render);
+    node.destroy();
+    //render.clear();
     // --- 恢复 flags
     if (!hasHero) delete core.status.hero;
     else if (flags != null) core.status.hero.flags = flags;
 }
 
-maps.prototype._drawThumbnail_realDrawTempCanvas = function (floorId, blocks, options, tempCanvas) {
-    // 缩略图：背景
-    this.drawBg(floorId, tempCanvas);
-    // 缩略图：事件
-    this.drawEvents(floorId, blocks, tempCanvas);
-    // 缩略图：勇士
-    if (options.heroLoc) {
-        options.heroIcon = options.heroIcon || core.getFlag("heroIcon", "hero.png");
-        options.heroIcon = core.getMappedName(options.heroIcon);
-        var icon = core.material.icons.hero[options.heroLoc.direction];
-        var height = core.material.images.images[options.heroIcon].height / 4;
-        tempCanvas.drawImage(core.material.images.images[options.heroIcon], icon.stop * 32, icon.loc * height, 32, height,
-            32 * options.heroLoc.x, 32 * options.heroLoc.y + 32 - height, 32, height);
-    }
-    // 缩略图：前景
-    this.drawFg(floorId, tempCanvas);
-    // 缩略图：显伤
-    if (options.damage)
-        core.control.updateDamage(floorId, tempCanvas);
+maps.prototype._drawThumbnail_realDrawTempCanvas = function (floorId, blocks, options, node) {
+    const _maps = pixi.maps;
+    node.id = 'bg';
+    node.args = [floorId];
+    _maps.drawBg(node, floorId);
+    node.id = 'event';
+    node.args = [  floorId, blocks ];
+    _maps.drawEvents(node, blocks, floorId);
+    node.id = 'fg';
+    node.args = [floorId];
+    _maps.drawFg(node, floorId);
+    // // 缩略图：勇士
+    // if (options.heroLoc) {
+    //     options.heroIcon = options.heroIcon || core.getFlag("heroIcon", "hero.png");
+    //     options.heroIcon = core.getMappedName(options.heroIcon);
+    //     var icon = core.material.icons.hero[options.heroLoc.direction];
+    //     var height = core.material.images.images[options.heroIcon].height / 4;
+    //     tempCanvas.drawImage(core.material.images.images[options.heroIcon], icon.stop * 32, icon.loc * height, 32, height,
+    //         32 * options.heroLoc.x, 32 * options.heroLoc.y + 32 - height, 32, height);
+    // }
+    // // 缩略图：前景
+    // this.drawFg(floorId, tempCanvas);
+    // // 缩略图：显伤
+    // if (options.damage)
+    //     core.control.updateDamage(floorId, tempCanvas);
 }
 
 maps.prototype._drawThumbnail_drawToTarget = function (floorId, toDraw) {
@@ -1257,8 +1271,8 @@ maps.prototype._drawThumbnail_drawToTarget = function (floorId, toDraw) {
     var centerX = toDraw.centerX, centerY = toDraw.centerY;
     if (centerX == null) centerX = Math.floor(width / 2);
     if (centerY == null) centerY = Math.floor(height / 2);
-    var tempCanvas = core.bigmap.tempCanvas, tempWidth = 32 * width, tempHeight = 32 * height;
-
+    const render = pixi.canvasRenderer;
+    var tempCanvas = render.view, tempWidth = 32 * width, tempHeight = 32 * height;
     core.clearMap(ctx, x, y, size, size);
     if (toDraw.all) {
         // 绘制全景图
@@ -1267,21 +1281,21 @@ maps.prototype._drawThumbnail_drawToTarget = function (floorId, toDraw) {
             var side = (size - realWidth) / 2;
             core.fillRect(ctx, x, y, side, realHeight, '#000000');
             core.fillRect(ctx, x + size - side, y, side, realHeight);
-            ctx.drawImage(tempCanvas.canvas, 0, 0, tempWidth, tempHeight, x + side, y, realWidth, realHeight);
+            ctx.drawImage(tempCanvas, 0, 0, tempWidth, tempHeight, x + side, y, realWidth, realHeight);
         }
         else {
             var realWidth = size, realHeight = realWidth * tempHeight / tempWidth;
             var side = (size - realHeight) / 2;
             core.fillRect(ctx, x, y, realWidth, side, '#000000');
             core.fillRect(ctx, x, y + size - side, realWidth, side);
-            ctx.drawImage(tempCanvas.canvas, 0, 0, tempWidth, tempHeight, x, y + side, realWidth, realHeight);
+            ctx.drawImage(tempCanvas, 0, 0, tempWidth, tempHeight, x, y + side, realWidth, realHeight);
         }
     }
     else {
         // 只绘制可见窗口
         var offsetX = core.clamp(centerX - core.__HALF_SIZE__, 0, width - core.__SIZE__),
             offsetY = core.clamp(centerY - core.__HALF_SIZE__, 0, height - core.__SIZE__);
-        ctx.drawImage(tempCanvas.canvas, offsetX * 32, offsetY * 32, core.__PIXELS__, core.__PIXELS__, x, y, size, size);
+        ctx.drawImage(tempCanvas, offsetX * 32, offsetY * 32, core.__PIXELS__, core.__PIXELS__, x, y, size, size);
     }
 }
 
@@ -1761,7 +1775,7 @@ maps.prototype._getAndRemoveBlock = function (x, y) {
 
 ////// 显示移动某块的动画，达到{“type”:”move”}的效果 //////
 maps.prototype.moveBlock = function (x, y, steps, time, keep, callback) {
-    // TODO: 当同时有两个阻击，会卡掉一个
+
     time = time || 500;
     var blockArr = this._getAndRemoveBlock(x, y);
     if (blockArr == null) {
@@ -1772,8 +1786,12 @@ maps.prototype.moveBlock = function (x, y, steps, time, keep, callback) {
     const moveSteps = (steps||[]).filter(function (t) {
         return ['up','down','left','right','forward','backward'].indexOf(t)>=0;
     });
-    pixi.maps.moveBlock(block, moveSteps, time, keep, callback);
-    
+    const id = utils.getId();
+    core.animateFrame.asyncId[id] = true;
+    pixi.maps.moveBlock(block, moveSteps, time, keep, () => {
+        delete core.animateFrame.asyncId[id];
+        if (callback instanceof Function)callback();
+    });
     // // var canvases = this._initDetachedBlock(blockInfo, x, y, block.event.animate !== false);
     // // this._moveDetachedBlock(blockInfo, 32 * x, 32 * y, 1, canvases);
     // var moveInfo = {

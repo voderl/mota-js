@@ -1,6 +1,7 @@
 export default control;
 import {functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a} from '../project/functions'
 import localforage from './thirdparty/localforage.min.js';
+import route from '../../pixi/scenes/route';
 /*
 control.js：游戏主要逻辑控制
 主要负责status相关内容，以及各种变量获取/存储
@@ -21,11 +22,11 @@ control.prototype._init = function () {
     // --- 注册系统的animationFrame
     this.registerAnimationFrame("totalTime", false, this._animationFrame_totalTime);
     this.registerAnimationFrame("autoSave", true, this._animationFrame_autoSave);
-    this.registerAnimationFrame("globalAnimate", true, this._animationFrame_globalAnimate);
-    this.registerAnimationFrame("animate", true, this._animationFrame_animate);
+    // this.registerAnimationFrame("globalAnimate", true, this._animationFrame_globalAnimate);
+    // this.registerAnimationFrame("animate", true, this._animationFrame_animate);
     this.registerAnimationFrame("heroMoving", true, this._animationFrame_heroMoving);
-    this.registerAnimationFrame("weather", true, this._animationFrame_weather);
-    this.registerAnimationFrame("tips", true, this._animateFrame_tips);
+    // this.registerAnimationFrame("weather", true, this._animationFrame_weather);
+    // this.registerAnimationFrame("tips", true, this._animateFrame_tips);
     this.registerAnimationFrame("parallelDo", false, this._animationFrame_parallelDo);
     this.registerAnimationFrame("checkConsoleOpened", true, this._animationFrame_checkConsoleOpened);
     // --- 注册系统的replay
@@ -416,9 +417,7 @@ control.prototype._initStatistics = function (totalTime) {
 // ------ 自动寻路，人物行走 ------ //
 
 ////// 清除自动寻路路线 //////
-control.prototype.clearAutomaticRouteNode = function (x, y) {
-    core.clearMap('route', x * 32 + 5 - core.status.automaticRoute.offsetX, y * 32 + 5 - core.status.automaticRoute.offsetY, 27, 27);
-}
+
 
 ////// 停止自动寻路操作 //////
 control.prototype.stopAutomaticRoute = function () {
@@ -433,7 +432,7 @@ control.prototype.stopAutomaticRoute = function () {
     core.status.automaticRoute.lastDirection = null;
     core.status.heroStop = true;
     if (core.status.automaticRoute.moveStepBeforeStop.length==0)
-        core.deleteCanvas('route');
+        route.clear();
 }
 
 ////// 保存剩下的寻路，并停止 //////
@@ -463,7 +462,7 @@ control.prototype.continueAutomaticRoute = function () {
 ////// 清空剩下的自动寻路列表 //////
 control.prototype.clearContinueAutomaticRoute = function (callback) {
     //TODO
-    core.deleteCanvas('route');
+    route.clear();
     core.status.automaticRoute.moveStepBeforeStop=[];
     if (callback) callback();
 }
@@ -471,11 +470,14 @@ control.prototype.clearContinueAutomaticRoute = function (callback) {
 ////// 显示离散的寻路点 //////
 // TODO
 control.prototype.fillPosWithPoint = function (pos) {
-    core.fillRect('ui', pos.x*32+12,pos.y*32+12,8,8, '#bfbfbf');
+    // core.fillRect('ui', pos.x*32+12,pos.y*32+12,8,8, '#bfbfbf');
+    route.fillPosWithPoint(pos);
 }
 
 ////// 设置自动寻路路线 //////
 control.prototype.setAutomaticRoute = function (destX, destY, stepPostfix) {
+    // 清空寻路node和 点选node
+    route.clear();
     if (!core.status.played || core.status.lockControl) return;
     if (this._setAutomaticRoute_isMoving(destX, destY)) return;
     if (this._setAutomaticRoute_isTurning(destX, destY, stepPostfix)) return;
@@ -490,7 +492,7 @@ control.prototype.setAutomaticRoute = function (destX, destY, stepPostfix) {
     this._setAutomaticRoute_drawRoute(moveStep);
     this._setAutomaticRoute_setAutoSteps(moveStep);
     // 立刻移动
-    core.setAutoHeroMove();
+    this.setAutoHeroMove();
 }
 
 control.prototype._setAutomaticRoute_isMoving = function (destX, destY) {
@@ -544,32 +546,7 @@ control.prototype._setAutomaticRoute_clickMoveDirectly = function (destX, destY,
 control.prototype._setAutomaticRoute_drawRoute = function (moveStep) {
     // 计算绘制区域的宽高，并尽可能小的创建route层
     // TODO
-    pixi.ui.drawRoute(moveStep);
-    var sx = core.bigmap.width * 32, sy = core.bigmap.height * 32, dx = 0, dy = 0;
-    moveStep.forEach(function (t) {
-        sx = Math.min(sx, t.x * 32); dx = Math.max(dx, t.x * 32);
-        sy = Math.min(sy, t.y * 32); dy = Math.max(dy, t.y * 32);
-    });
-    core.status.automaticRoute.offsetX = sx;
-    core.status.automaticRoute.offsetY = sy;
-    var ctx = core.createCanvas('route', sx-core.bigmap.offsetX, sy-core.bigmap.offsetY, dx-sx+32, dy-sy+32, 95);
-    ctx.fillStyle = '#bfbfbf';
-    ctx.strokeStyle = '#bfbfbf';
-    ctx.lineWidth = 8;
-    for (var m = 0; m < moveStep.length; m++) {
-        if (m == moveStep.length - 1) {
-            ctx.fillRect(moveStep[m].x * 32 + 10 - sx, moveStep[m].y * 32 + 10 - sy, 12, 12);
-        }
-        else {
-            ctx.beginPath();
-            var cx = moveStep[m].x*32 +16 - sx, cy = moveStep[m].y*32+16 - sy;
-            var currDir = moveStep[m].direction, nextDir = moveStep[m+1].direction;
-            ctx.moveTo(cx-core.utils.scan[currDir].x*11, cy-core.utils.scan[currDir].y*11);
-            ctx.lineTo(cx, cy);
-            ctx.lineTo(cx+core.utils.scan[nextDir].x*11, cy+core.utils.scan[nextDir].y*11);
-            ctx.stroke();
-        }
-    }
+    route.drawRoute(moveStep);
 }
 
 control.prototype._setAutomaticRoute_setAutoSteps = function (moveStep) {
@@ -596,7 +573,7 @@ control.prototype.setAutoHeroMove = function (steps) {
     core.status.automaticRoute.autoHeroMove = true;
     core.status.automaticRoute.autoStep = 1;
     core.status.automaticRoute.destStep = steps[0].step;
-    core.moveHero(steps[0].direction);
+    this.moveHero(steps[0].direction);
 }
 
 ////// 设置行走的效果动画 //////
@@ -648,7 +625,7 @@ control.prototype._moveAction_noPass = function (canMove, callback) {
     core.drawHero();
 
     if (core.status.automaticRoute.moveStepBeforeStop.length==0) {
-        core.clearContinueAutomaticRoute();
+        this.clearContinueAutomaticRoute();
         core.stopAutomaticRoute();
     }
     if (callback) callback();
@@ -662,6 +639,7 @@ control.prototype._moveAction_moving = function (callback) {
 
         // 无事件的道具（如血瓶）需要优先于阻激夹域判定
         var nowx = core.getHeroLoc('x'), nowy = core.getHeroLoc('y');
+        route.clearAutomaticRouteNode(nowx, nowy);
         var block = core.getBlock(nowx,nowy);
         var hasTrigger = false;
         if (block!=null && block.block.event.trigger=='getItem' &&
@@ -817,7 +795,6 @@ control.prototype.drawHero = function (status, offset) {
     var dx = way.x, dy = way.y, offsetX = dx * offset, offsetY = dy * offset;
     core.bigmap.offsetX = core.clamp((x - core.__HALF_SIZE__) * 32 + offsetX, 0, 32*core.bigmap.width-core.__PIXELS__);
     core.bigmap.offsetY = core.clamp((y - core.__HALF_SIZE__) * 32 + offsetY, 0, 32*core.bigmap.height-core.__PIXELS__);
-    core.clearAutomaticRouteNode(x+dx, y+dy);
     core.status.heroCenter.px = 32 * x + offsetX + 16;
     core.status.heroCenter.py = 32 * y + offsetY + 32 - core.material.icons.hero.height / 2;
     const heroSprite = core.status.heroSprite;
@@ -833,9 +810,7 @@ control.prototype.drawHero = function (status, offset) {
             , block.posy+32-block.height + core.bigmap.offsetY);
         });
     }
-
-    core.control.updateViewport();
-    core.setGameCanvasTranslate('hero', 0, 0);
+    this.updateViewport();
 }
 
 control.prototype._drawHero_getDrawObjs = function (direction, x, y, status, offset) {
@@ -870,22 +845,6 @@ control.prototype._drawHero_getDrawObjs = function (direction, x, y, status, off
 // ------ 画布、位置、阻激夹域，显伤 ------ //
 
 ////// 设置画布偏移
-control.prototype.setGameCanvasTranslate = function(canvas,x,y){
-    return;
-    var c=core.dom.gameCanvas[canvas];
-    x=x*core.domStyle.scale;
-    y=y*core.domStyle.scale;
-    c.style.transform='translate('+x+'px,'+y+'px)';
-    c.style.webkitTransform='translate('+x+'px,'+y+'px)';
-    c.style.OTransform='translate('+x+'px,'+y+'px)';
-    c.style.MozTransform='translate('+x+'px,'+y+'px)';
-    if(main.mode==='editor' && editor.isMobile){
-        c.style.transform='translate('+(x/core.__PIXELS__*96)+'vw,'+(y/core.__PIXELS__*96)+'vw)';
-        c.style.webkitTransform='translate('+(x/core.__PIXELS__*96)+'vw,'+(y/core.__PIXELS__*96)+'vw)';
-        c.style.OTransform='translate('+(x/core.__PIXELS__*96)+'vw,'+(y/core.__PIXELS__*96)+'vw)';
-        c.style.MozTransform='translate('+(x/core.__PIXELS__*96)+'vw,'+(y/core.__PIXELS__*96)+'vw)';
-    }
-};
 
 ////// 加减画布偏移
 control.prototype.addGameCanvasTranslate = function (x, y) {
@@ -909,9 +868,12 @@ control.prototype.updateViewport = function() {
     //pixi.game.container.setTransform(- core.bigmap.offsetX,- core.bigmap.offsetY);
     const container = pixi.game.container;
     const [offsetX, offsetY] = container.zone;
-    pixi.game.container.setTransform(offsetX - core.bigmap.offsetX, offsetY - core.bigmap.offsetY);
+    const x = offsetX - core.bigmap.offsetX;
+    const y =offsetY - core.bigmap.offsetY;
+    if (container.x !== x || container.y !== y) {
+        container.position.set(x, y);
+    }
     // ------ 路线
-    core.relocateCanvas('route', core.status.automaticRoute.offsetX - core.bigmap.offsetX, core.status.automaticRoute.offsetY - core.bigmap.offsetY);
 }
 
 ////// 设置视野范围 //////
@@ -920,9 +882,6 @@ control.prototype.setViewport = function (x, y) {
     core.bigmap.offsetY = core.clamp(y, 0, 32 * core.bigmap.height - core.__PIXELS__);
     this.updateViewport();
     // ------ hero层也需要！
-    var hero_x = core.clamp((core.getHeroLoc('x') - core.__HALF_SIZE__) * 32, 0, 32*core.bigmap.width-core.__PIXELS__);
-    var hero_y = core.clamp((core.getHeroLoc('y') - core.__HALF_SIZE__) * 32, 0, 32*core.bigmap.height-core.__PIXELS__);
-    core.control.setGameCanvasTranslate('hero', hero_x - core.bigmap.offsetX, hero_y - core.bigmap.offsetY);
 }
 
 ////// 移动视野范围 //////

@@ -1,5 +1,5 @@
-import '../pixi/pixi';
-
+import './styles.css';
+import '../pixi/pixi.js';
 import actions from './libs/actions.js'
 import control from './libs/control.js'
 import _core from './libs/core.js'
@@ -14,7 +14,6 @@ import maps from './libs/maps.js'
 import ui from './libs/ui.js'
 import utils from './libs/utils.js'
 import { data_a1e2fb4a_e986_4524_b0da_9b7ba7c0874d } from './project/data'
-import './styles.css';
 
 function _main() {
     
@@ -108,37 +107,6 @@ function _main() {
     ];
 
     this.statusBar = {
-        'image': {
-            'floor': document.getElementById('img-floor'),
-            'name': document.getElementById('img-name'),
-            'lv': document.getElementById('img-lv'),
-            'hpmax': document.getElementById('img-hpmax'),
-            'hp': document.getElementById("img-hp"),
-            'mana': document.getElementById("img-mana"),
-            'atk': document.getElementById("img-atk"),
-            'def': document.getElementById("img-def"),
-            'mdef': document.getElementById("img-mdef"),
-            'money': document.getElementById("img-money"),
-            'experience': document.getElementById("img-experience"),
-            'up': document.getElementById("img-up"),
-            'skill': document.getElementById('img-skill'),
-            'book': document.getElementById("img-book"),
-            'fly': document.getElementById("img-fly"),
-            'toolbox': document.getElementById("img-toolbox"),
-            'keyboard': document.getElementById("img-keyboard"),
-            'shop': document.getElementById('img-shop'),
-            'save': document.getElementById("img-save"),
-            'load': document.getElementById("img-load"),
-            'settings': document.getElementById("img-settings"),
-            'btn1': document.getElementById("img-btn1"),
-            'btn2': document.getElementById("img-btn2"),
-            'btn3': document.getElementById("img-btn3"),
-            'btn4': document.getElementById("img-btn4"),
-            'btn5': document.getElementById("img-btn5"),
-            'btn6': document.getElementById("img-btn6"),
-            'btn7': document.getElementById("img-btn7"),
-            'btn8': document.getElementById("img-btn8"),
-        },
         'icons': {
             'floor': 0,
             'name': null,
@@ -181,29 +149,6 @@ function _main() {
             'btn7': 37,
             'btn8': 38
         },
-        'floor': document.getElementById('floor'),
-        'name': document.getElementById('name'),
-        'lv': document.getElementById('lv'),
-        'hpmax': document.getElementById('hpmax'),
-        'hp': document.getElementById('hp'),
-        'mana': document.getElementById('mana'),
-        'atk': document.getElementById('atk'),
-        'def': document.getElementById("def"),
-        'mdef': document.getElementById('mdef'),
-        'money': document.getElementById("money"),
-        'experience': document.getElementById("experience"),
-        'up': document.getElementById('up'),
-        'skill': document.getElementById('skill'),
-        'yellowKey': document.getElementById("yellowKey"),
-        'blueKey': document.getElementById("blueKey"),
-        'redKey': document.getElementById("redKey"),
-        'poison': document.getElementById('poison'),
-        'weak':document.getElementById('weak'),
-        'curse': document.getElementById('curse'),
-        'pickaxe': document.getElementById('pickaxe'),
-        'bomb': document.getElementById('bomb'),
-        'fly': document.getElementById('fly'),
-        'hard': document.getElementById("hard")
     }
     this.floors = {}
     this.canvas = {};
@@ -220,21 +165,21 @@ _main.prototype.init = function (mode, callback) {
     //load project
     var mainData = data_a1e2fb4a_e986_4524_b0da_9b7ba7c0874d.main;
     for(var ii in mainData)main[ii]=mainData[ii];
-    main.dom.startBackground.src=require("./project/images/"+main.startBackground).default;
-    main.dom.startLogo.style=main.startLogoStyle;
-    main.dom.startButtonGroup.style = main.startButtonsStyle;
-    main.levelChoose.forEach(function(value){
-        var span = document.createElement('span');
-        span.setAttribute('class','startButton');
-        span.innerText=value[0];
-        (function(span,str_){
-            span.onclick = function () {
-                core.events.startGame(str_);
-            }
-        })(span,value[1]);
-        main.dom.levelChooseButtons.appendChild(span);
-    });
-    main.createOnChoiceAnimation();
+    // main.dom.startBackground.src=require("./project/images/"+main.startBackground).default;
+    // main.dom.startLogo.style=main.startLogoStyle;
+    // main.dom.startButtonGroup.style = main.startButtonsStyle;
+    // main.levelChoose.forEach(function(value){
+    //     var span = document.createElement('span');
+    //     span.setAttribute('class','startButton');
+    //     span.innerText=value[0];
+    //     (function(span,str_){
+    //         span.onclick = function () {
+    //             core.events.startGame(str_);
+    //         }
+    //     })(span,value[1]);
+    //     main.dom.levelChooseButtons.appendChild(span);
+    // });
+    // main.createOnChoiceAnimation();
     
     const core = new _core();
     window.core = core;
@@ -253,8 +198,6 @@ _main.prototype.init = function (mode, callback) {
     core.utils = new utils();
     main.lzw=utils.lzw;
     main.loadFile = {
-        images:require.context('./project/images',false,/\.(png|svg|jpg|gif|ico)$/),
-        animates:require.context('./project/animates',false,/\.animate$/),
         sounds:require.context('./project/sounds',false,/\.(mp3|wav|wma|ogg|ape|acc)$/),
     };
     main.loadFloors(function() {
@@ -325,7 +268,7 @@ _main.prototype.loadFloors = function (callback) {
             main.loadFloor(main.floorIds[i], function (modName) {
                 main.setMainTipsText("楼层 " + modName + '.js 加载完毕');
                 if (Object.keys(main.floors).length === main.floorIds.length) {
-                    main.dom.mainTips.style.display = 'none';
+                    // main.dom.mainTips.style.display = 'none';
                     callback();
                 }
             });
@@ -418,7 +361,7 @@ window.onresize = function () {
 ////// 在界面上按下某按键时 //////
 main.dom.body.onkeydown = function(e) {
     try {
-        if (main.dom.inputDiv.style.display == 'block') return;
+        // if (main.dom.inputDiv.style.display == 'block') return;
         if (main.core && (main.core.isPlaying() || main.core.status.lockControl))
             main.core.onkeyDown(e);
     } catch (ee) { main.log(ee); }
@@ -441,39 +384,39 @@ main.dom.body.onkeyup = function(e) {
             e.stopPropagation();
             return;
         }
-        if (main.dom.inputDiv.style.display == 'block') {
-            if (e.keyCode == 13) {
-                setTimeout(function () {
-                    main.dom.inputYes.click();
-                }, 50);
-            }
-            else if (e.keyCode == 27) {
-                setTimeout(function () {
-                    main.dom.inputNo.click();
-                }, 50);
-            }
-            return;
-        }
+        // if (main.dom.inputDiv.style.display == 'block') {
+        //     if (e.keyCode == 13) {
+        //         setTimeout(function () {
+        //             main.dom.inputYes.click();
+        //         }, 50);
+        //     }
+        //     else if (e.keyCode == 27) {
+        //         setTimeout(function () {
+        //             main.dom.inputNo.click();
+        //         }, 50);
+        //     }
+        //     return;
+        // }
         if (main.core && main.core.isPlaying && main.core.status &&
             (main.core.isPlaying() || main.core.status.lockControl))
             main.core.onkeyUp(e);
     } catch (ee) { main.log(ee); }
 };
 
-[main.dom.startButtons, main.dom.levelChooseButtons].forEach(function (dom) {
-    dom.onmousemove = function (e) {
-        for (var i = 0; i < dom.children.length; ++i) {
-            if (dom.children[i] == e.target && i != (main.selectedButton || 0)) {
-                main.selectButton(i);
-            }
-        }
-    }
-});
+// [main.dom.startButtons, main.dom.levelChooseButtons].forEach(function (dom) {
+//     dom.onmousemove = function (e) {
+//         for (var i = 0; i < dom.children.length; ++i) {
+//             if (dom.children[i] == e.target && i != (main.selectedButton || 0)) {
+//                 main.selectButton(i);
+//             }
+//         }
+//     }
+// });
 
-////// 开始选择时 //////
-main.dom.body.onselectstart = function () {
-    return false;
-}
+// ////// 开始选择时 //////
+// main.dom.body.onselectstart = function () {
+//     return false;
+// }
 
 ////// 鼠标按下时 //////
 main.dom.data.onmousedown = function (e) {
@@ -550,282 +493,61 @@ main.dom.data.ontouchend = function (e) {
     }
 }
 
-// main.dom.statusCanvas.onclick = function (e) {
+// ////// 点击“开始游戏”时 //////
+// main.dom.playGame.onclick = function () {
+//     main.dom.startButtons.style.display='none';
+//     main.core.control.checkBgm();
+
+//     if (main.core.isset(main.core.flags.startDirectly) && main.core.flags.startDirectly) {
+//         core.events.startGame("");
+//     }
+//     else {
+//         main.dom.levelChooseButtons.style.display='block';
+//         main.selectedButton = null;
+//         main.selectButton(0);
+//     }
+// }
+
+// ////// 点击“载入游戏”时 //////
+// main.dom.loadGame.onclick = function() {
+//     main.core.control.checkBgm();
+//     main.core.load();
+// }
+
+// ////// 点击“录像回放”时 //////
+// main.dom.replayGame.onclick = function () {
+//     main.core.control.checkBgm();
+//     main.core.chooseReplayFile();
+// }
+
+// main.dom.musicBtn.onclick = function () {
 //     try {
-//         e.preventDefault();
-//         main.core.onStatusBarClick(e);
-//     } catch (e) {
-//         main.log(e);
+//         if (main.core)
+//             main.core.triggerBgm();
+//     } catch (e) {main.log(e);}
+// }
+
+// window.onblur = function () {
+//     if (main.core && main.core.control) {
+//         try {
+//             main.core.control.checkAutosave();
+//         } catch (e) {}
 //     }
 // }
 
-// ////// 点击状态栏中的怪物手册时 //////
-// main.statusBar.image.book.onclick = function (e) {
-//     e.stopPropagation();
-
-//     if (core.isReplaying()) {
-//         core.triggerReplay();
-//         return;
-//     }
-
-//     if (main.core.isPlaying() && (core.status.event||{}).id=='paint') {
-//         core.actions.setPaintMode('paint');
-//         return;
-//     }
-
-//     if (main.core.isPlaying())
-//         main.core.openBook(true);
+// main.dom.inputYes.onclick = function () {
+//     main.dom.inputDiv.style.display = 'none';
+//     var func = core.platform.successCallback;
+//     core.platform.successCallback = core.platform.errorCallback = null;
+//     if (func) func(main.dom.inputBox.value);
 // }
 
-// ////// 点击状态栏中的楼层传送器/装备栏时 //////
-// main.statusBar.image.fly.onclick = function (e) {
-//     e.stopPropagation();
-
-//     // 播放录像时
-//     if (core.isReplaying()) {
-//         core.stopReplay();
-//         return;
-//     }
-
-//     // 绘图模式
-//     if (main.core.isPlaying() && (core.status.event||{}).id=='paint') {
-//         core.actions.setPaintMode('erase');
-//         return;
-//     }
-
-//     if (main.core.isPlaying()) {
-//         if (!main.core.flags.equipboxButton) {
-//             main.core.useFly(true);
-//         }
-//         else {
-//             main.core.openEquipbox(true)
-//         }
-//     }
+// main.dom.inputNo.onclick = function () {
+//     main.dom.inputDiv.style.display = 'none';
+//     var func = core.platform.errorCallback;
+//     core.platform.successCallback = core.platform.errorCallback = null;
+//     if (func) func(null);
 // }
-
-// ////// 点击状态栏中的工具箱时 //////
-// main.statusBar.image.toolbox.onclick = function (e) {
-//     e.stopPropagation();
-
-//     if (core.isReplaying()) {
-//         core.rewindReplay();
-//         return;
-//     }
-
-//     if (main.core.isPlaying() && (core.status.event||{}).id=='paint') {
-//         core.actions.clearPaint();
-//         return;
-//     }
-
-//     if (main.core.isPlaying()) {
-//         main.core.openToolbox(core.status.event.id != 'equipbox');
-//     }
-// }
-
-// ////// 双击状态栏中的工具箱时 //////
-// main.statusBar.image.toolbox.ondblclick = function (e) {
-//     e.stopPropagation();
-
-//     if (core.isReplaying()) {
-//         return;
-//     }
-
-//     if (main.core.isPlaying())
-//         main.core.openEquipbox(true);
-
-// }
-
-// ////// 点击状态栏中的虚拟键盘时 //////
-// main.statusBar.image.keyboard.onclick = function (e) {
-//     e.stopPropagation();
-
-//     if (core.isReplaying()) {
-//         core.bookReplay();
-//         return;
-//     }
-
-//     if (main.core.isPlaying())
-//         main.core.openKeyBoard(true);
-// }
-
-// ////// 点击状态栏中的快捷商店键盘时 //////
-// main.statusBar.image.shop.onclick = function (e) {
-//     e.stopPropagation();
-
-//     if (core.isReplaying()) {
-//         core.viewMapReplay();
-//         return;
-//     }
-
-//     if (main.core.isPlaying())
-//         main.core.openQuickShop(true);
-// }
-
-// ////// 点击金币时也可以开启虚拟键盘 //////
-// main.statusBar.image.money.onclick = function (e) {
-//     e.stopPropagation();
-
-//     if (main.core.isPlaying())
-//         main.core.openQuickShop(true);
-// }
-
-// ////// 点击状态栏中的存档按钮时 //////
-// main.statusBar.image.save.onclick = function (e) {
-//     e.stopPropagation();
-
-//     if (core.isReplaying()) {
-//         core.speedDownReplay();
-//         return;
-//     }
-
-//     if (main.core.isPlaying() && (core.status.event||{}).id=='paint') {
-//         core.actions.savePaint();
-//         return;
-//     }
-
-//     if (main.core.isPlaying())
-//         main.core.save(true);
-// }
-
-// ////// 点击状态栏中的读档按钮时 //////
-// main.statusBar.image.load.onclick = function (e) {
-//     e.stopPropagation();
-
-//     if (core.isReplaying()) {
-//         core.speedUpReplay();
-//         return;
-//     }
-
-//     if (main.core.isPlaying() && (core.status.event||{}).id=='paint') {
-//         core.actions.loadPaint();
-//         return;
-//     }
-
-//     if (main.core.isPlaying())
-//         main.core.load(true);
-// }
-
-// ////// 点击状态栏中的系统菜单时 //////
-// main.statusBar.image.settings.onclick = function (e) {
-//     e.stopPropagation();
-
-//     if (core.isReplaying()) {
-//         core.saveReplay();
-//         return;
-//     }
-
-//     if (main.core.isPlaying() && (core.status.event||{}).id=='paint') {
-//         core.actions.exitPaint();
-//         return;
-//     }
-
-//     if (main.core.isPlaying())
-//         main.core.openSettings(true);
-// }
-
-// ////// 点击工具栏时 //////
-// main.dom.hard.onclick = function () {
-//     if (core.isReplaying())
-//         return;
-//     main.core.control.setToolbarButton(!core.domStyle.toolbarBtn);
-// }
-
-// ////// 手机端的按钮1-7 //////
-// main.statusBar.image.btn1.onclick = function (e) {
-//     e.stopPropagation();
-//     main.core.onkeyUp({"keyCode": 49});
-// };
-
-// main.statusBar.image.btn2.onclick = function (e) {
-//     e.stopPropagation();
-//     main.core.onkeyUp({"keyCode": 50});
-// };
-
-// main.statusBar.image.btn3.onclick = function (e) {
-//     e.stopPropagation();
-//     main.core.onkeyUp({"keyCode": 51});
-// };
-
-// main.statusBar.image.btn4.onclick = function (e) {
-//     e.stopPropagation();
-//     main.core.onkeyUp({"keyCode": 52});
-// };
-
-// main.statusBar.image.btn5.onclick = function (e) {
-//     e.stopPropagation();
-//     main.core.onkeyUp({"keyCode": 53});
-// };
-
-// main.statusBar.image.btn6.onclick = function (e) {
-//     e.stopPropagation();
-//     main.core.onkeyUp({"keyCode": 54});
-// };
-
-// main.statusBar.image.btn7.onclick = function (e) {
-//     e.stopPropagation();
-//     main.core.onkeyUp({"keyCode": 55});
-// };
-
-// main.statusBar.image.btn8.onclick = function (e) {
-//     e.stopPropagation();
-//     main.core.onkeyUp({"keyCode": 56});
-// };
-
-////// 点击“开始游戏”时 //////
-main.dom.playGame.onclick = function () {
-    main.dom.startButtons.style.display='none';
-    main.core.control.checkBgm();
-
-    if (main.core.isset(main.core.flags.startDirectly) && main.core.flags.startDirectly) {
-        core.events.startGame("");
-    }
-    else {
-        main.dom.levelChooseButtons.style.display='block';
-        main.selectedButton = null;
-        main.selectButton(0);
-    }
-}
-
-////// 点击“载入游戏”时 //////
-main.dom.loadGame.onclick = function() {
-    main.core.control.checkBgm();
-    main.core.load();
-}
-
-////// 点击“录像回放”时 //////
-main.dom.replayGame.onclick = function () {
-    main.core.control.checkBgm();
-    main.core.chooseReplayFile();
-}
-
-main.dom.musicBtn.onclick = function () {
-    try {
-        if (main.core)
-            main.core.triggerBgm();
-    } catch (e) {main.log(e);}
-}
-
-window.onblur = function () {
-    if (main.core && main.core.control) {
-        try {
-            main.core.control.checkAutosave();
-        } catch (e) {}
-    }
-}
-
-main.dom.inputYes.onclick = function () {
-    main.dom.inputDiv.style.display = 'none';
-    var func = core.platform.successCallback;
-    core.platform.successCallback = core.platform.errorCallback = null;
-    if (func) func(main.dom.inputBox.value);
-}
-
-main.dom.inputNo.onclick = function () {
-    main.dom.inputDiv.style.display = 'none';
-    var func = core.platform.errorCallback;
-    core.platform.successCallback = core.platform.errorCallback = null;
-    if (func) func(null);
-}
 
 }//listen end
 

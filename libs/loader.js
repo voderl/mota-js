@@ -21,11 +21,11 @@ loader.prototype._setStartProgressVal = function (val) {
 
 ////// 设置加载进度条提示文字 //////
 loader.prototype._setStartLoadTipText = function (text) {
-    core.dom.startTopLoadTips.innerText = text;
+    // core.dom.startTopLoadTips.innerText = text;
 }
 
 loader.prototype._load = function (callback) {
-    pixi.event.once('loadComplete',(textures)=>{
+    const cb = (textures)=>{
         const data = Object.keys(main.statusBar.icons);
         const temp = { };
         data.forEach((name) => {
@@ -37,10 +37,13 @@ loader.prototype._load = function (callback) {
         core.statusBar.icons = temp;
         callback();
         // this._loadAnimates(textures);
-    })
+    }
+    this._loadMusic();
+    if (pixi.loader.complete) cb(pixi.loader.textures);
+    else pixi.event.once('loadComplete', cb);
     // this._loadIcons();
     // this._loadAnimates();
-    this._loadMusic();
+    
 
     // core.loader._loadMaterialImages(function () {
     //     core.loader._loadExtraImages(function () {
@@ -207,30 +210,30 @@ loader.prototype.loadImagesFromZip = function (url, names, toSave, callback) {
     });
 }
 loader.prototype.loadImage = function (imgName, callback) {
-    let images=main.loadFile.images;
-    try {
-        var name = imgName;
-        if (name.indexOf(".") < 0)
-            name = name + ".png";
-        var image = new Image();
+    // let images=main.loadFile.images;
+    // try {
+    //     var name = imgName;
+    //     if (name.indexOf(".") < 0)
+    //         name = name + ".png";
+    //     var image = new Image();
 
-        var src=images('./'+name).default;
+    //     var src=images('./'+name).default;
 
 
-        image.onload = function () {
-            callback(imgName, image);
-        }
-        image.onerror = function () {
-            callback(imgName, null);
-        }
-        image.src = src;
+    //     image.onload = function () {
+    //         callback(imgName, image);
+    //     }
+    //     image.onerror = function () {
+    //         callback(imgName, null);
+    //     }
+    //     image.src = src;
         
-        if (name.endsWith('.gif'))
-            callback(imgName, null);
-    }
-    catch (e) {
-        main.log(e);
-    }
+    //     if (name.endsWith('.gif'))
+    //         callback(imgName, null);
+    // }
+    // catch (e) {
+    //     main.log(e);
+    // }
 }
 
 loader.prototype._loadAnimates = function (textures) {

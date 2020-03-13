@@ -1015,11 +1015,11 @@ export var functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a =
 	// 加载勇士图标
 	var icon = core.getFlag("heroIcon", "hero.png");
 	icon = core.getMappedName(icon);
-	if (core.material.images.images[icon]) {
-		core.material.images.hero = core.material.images.images[icon];
-		core.material.icons.hero.width = core.material.images.images[icon].width / 4;
-		core.material.icons.hero.height = core.material.images.images[icon].height / 4;
-	}
+	// if (core.material.images.images[icon]) {
+	// 	core.material.images.hero = core.material.images.images[icon];
+	// 	core.material.icons.hero.width = core.material.images.images[icon].width / 4;
+	// 	core.material.icons.hero.height = core.material.images.images[icon].height / 4;
+	// }
 
 	// TODO：增加自己的一些读档处理
 
