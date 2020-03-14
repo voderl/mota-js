@@ -2,6 +2,7 @@ export default control;
 import {functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a} from '../project/functions'
 import localforage from './thirdparty/localforage.min.js';
 import route from '../../pixi/scenes/route';
+import hero from '../../pixi/scenes/hero';
 /*
 control.js：游戏主要逻辑控制
 主要负责status相关内容，以及各种变量获取/存储
@@ -24,7 +25,7 @@ control.prototype._init = function () {
     this.registerAnimationFrame("autoSave", true, this._animationFrame_autoSave);
     // this.registerAnimationFrame("globalAnimate", true, this._animationFrame_globalAnimate);
     // this.registerAnimationFrame("animate", true, this._animationFrame_animate);
-    this.registerAnimationFrame("heroMoving", true, this._animationFrame_heroMoving);
+    // this.registerAnimationFrame("heroMoving", true, this._animationFrame_heroMoving);
     // this.registerAnimationFrame("weather", true, this._animationFrame_weather);
     // this.registerAnimationFrame("tips", true, this._animateFrame_tips);
     this.registerAnimationFrame("parallelDo", false, this._animationFrame_parallelDo);
@@ -485,7 +486,7 @@ control.prototype.setAutomaticRoute = function (destX, destY, stepPostfix) {
     // 找寻自动寻路路线
     var moveStep = core.automaticRoute(destX, destY);
     if (moveStep.length == 0 && (destX != core.status.hero.loc.x || destY != core.status.hero.loc.y || stepPostfix.length == 0))
-        return;
+        return route.wrong(destX, destY);
     moveStep = moveStep.concat(stepPostfix);
     core.status.automaticRoute.destX=destX;
     core.status.automaticRoute.destY=destY;
@@ -584,9 +585,13 @@ control.prototype.setHeroMoveInterval = function (callback) {
         if (callback) callback();
         return;
     }
-
-    core.status.heroMoving=1;
-
+    core.status.heroMoving = 1;
+    hero.move((core.values.moveSpeed || 100) / core.status.replay.speed, () => {
+        core.status.heroMoving = 0;
+        this.moveOneStep(core.nextX(), core.nextY());
+        if (callback instanceof Function) callback();
+    });
+    return;
     var toAdd = 1;
     if (core.status.replay.speed>3) toAdd = 2;
     if (core.status.replay.speed>6) toAdd = 4;
@@ -622,7 +627,7 @@ control.prototype._moveAction_noPass = function (canMove, callback) {
     core.status.automaticRoute.moveStepBeforeStop = [];
     core.status.automaticRoute.lastDirection = core.getHeroLoc('direction');
     if (canMove) core.events._trigger(core.nextX(), core.nextY());
-    core.drawHero();
+    hero.draw();
 
     if (core.status.automaticRoute.moveStepBeforeStop.length==0) {
         this.clearContinueAutomaticRoute();
@@ -632,7 +637,7 @@ control.prototype._moveAction_noPass = function (canMove, callback) {
 }
 
 control.prototype._moveAction_moving = function (callback) {
-    core.setHeroMoveInterval(function () {
+    this.setHeroMoveInterval(function () {
         var direction = core.getHeroLoc('direction');
         core.control._moveAction_popAutomaticRoute();
         core.status.route.push(direction);
@@ -787,30 +792,37 @@ control.prototype.tryMoveDirectly = function (destX, destY) {
 
 ////// 绘制勇士 //////
 control.prototype.drawHero = function (status, offset) {
-    if (!core.isPlaying() || !core.status.floorId || core.status.gameOver) return;
-    var x = core.getHeroLoc('x'), y = core.getHeroLoc('y'), direction = core.getHeroLoc('direction');
-    status = status || 'stop';
-    offset = offset || 0;
-    var way = core.utils.scan[direction];
-    var dx = way.x, dy = way.y, offsetX = dx * offset, offsetY = dy * offset;
-    core.bigmap.offsetX = core.clamp((x - core.__HALF_SIZE__) * 32 + offsetX, 0, 32*core.bigmap.width-core.__PIXELS__);
-    core.bigmap.offsetY = core.clamp((y - core.__HALF_SIZE__) * 32 + offsetY, 0, 32*core.bigmap.height-core.__PIXELS__);
-    core.status.heroCenter.px = 32 * x + offsetX + 16;
-    core.status.heroCenter.py = 32 * y + offsetY + 32 - core.material.icons.hero.height / 2;
-    const heroSprite = core.status.heroSprite;
-    if (!heroSprite) return;
-    if (!core.hasFlag('hideHero')) {
-        this._drawHero_getDrawObjs(direction, x, y, status, offset).forEach(function (block) {
-            core.drawImage('hero', block.img, block.heroIcon[block.status]*block.width,
-                block.heroIcon.loc * block.height, block.width, block.height,
-                block.posx+(32-block.width)/2, block.posy+32-block.height, block.width, block.height);
-            if (heroSprite.status !== direction) heroSprite.change(direction);
-            heroSprite.gotoAndStop(block.heroIcon[block.status]);
-            heroSprite.position.set(block.posx+(32-block.width)/2 + core.bigmap.offsetX
-            , block.posy+32-block.height + core.bigmap.offsetY);
-        });
-    }
-    this.updateViewport();
+    // if (!core.isPlaying() || !core.status.floorId || core.status.gameOver) return;
+    hero.draw();
+    // var x = core.getHeroLoc('x'), y = core.getHeroLoc('y'), direction = core.getHeroLoc('direction');
+    // status = status || 'stop';
+    // offset = offset || 0;
+    // var way = core.utils.scan[direction];
+    // var dx = way.x, dy = way.y, offsetX = dx * offset, offsetY = dy * offset;
+    // core.bigmap.offsetX = core.clamp((x - core.__HALF_SIZE__) * 32 + offsetX, 0, 32*core.bigmap.width-core.__PIXELS__);
+    // core.bigmap.offsetY = core.clamp((y - core.__HALF_SIZE__) * 32 + offsetY, 0, 32*core.bigmap.height-core.__PIXELS__);
+    // const { heroCenter, heroSprite } = core.status;
+    // if (!heroSprite) return;
+    // heroCenter.px = 32 * x + offsetX + 16;
+    // heroCenter.py = 32 * y + offsetY + 32 - heroSprite.height / 2;
+    // if (heroSprite.status !== direction) heroSprite.change(direction);
+    // if (status === 'stop') {
+    //     heroSprite.gotoAndStop(0);
+    // }
+    // else heroSprite.play();
+    // heroSprite.position.set(heroCenter.px, heroCenter.py);
+    // if (!core.hasFlag('hideHero')) {
+    //     this._drawHero_getDrawObjs(direction, x, y, status, offset).forEach(function (block) {
+    //         core.drawImage('hero', block.img, block.heroIcon[block.status]*block.width,
+    //             block.heroIcon.loc * block.height, block.width, block.height,
+    //             block.posx+(32-block.width)/2, block.posy+32-block.height, block.width, block.height);
+    //         if (heroSprite.status !== direction) heroSprite.change(direction);
+    //         heroSprite.gotoAndStop(block.heroIcon[block.status]);
+    //         heroSprite.position.set(block.posx+(32-block.width)/2 + core.bigmap.offsetX
+    //         , block.posy+32-block.height + core.bigmap.offsetY);
+    //     });
+    // }
+    // this.updateViewport();
 }
 
 control.prototype._drawHero_getDrawObjs = function (direction, x, y, status, offset) {
@@ -848,6 +860,7 @@ control.prototype._drawHero_getDrawObjs = function (direction, x, y, status, off
 
 ////// 加减画布偏移
 control.prototype.addGameCanvasTranslate = function (x, y) {
+    return;
     for(var ii=0,canvas;canvas=core.dom.gameCanvas[ii];ii++){
         var id = canvas.getAttribute('id');
         if (id=='ui' || id=='data') continue; // UI层和data层不移动
@@ -2102,21 +2115,22 @@ control.prototype.getMappedName = function (name) {
 control.prototype.setWeather = function (type, level) {
     // 非雨雪
     if (type == null) {
-        core.deleteCanvas('weather')
-        core.animateFrame.weather.type = null;
-        core.animateFrame.weather.nodes = [];
+        // pixi.weather.remove();
+        // core.deleteCanvas('weather')
+        // core.animateFrame.weather.type = null;
+        // core.animateFrame.weather.nodes = [];
         return;
     }
     // 当前天气：则忽略
     if (type==core.animateFrame.weather.type && level == null) return;
     level = core.clamp(parseInt(level) || 5, 1, 10);
     level *= parseInt(20*core.bigmap.width*core.bigmap.height/(core.__SIZE__*core.__SIZE__));
-
+    pixi.weather.add(type, level);
     // 计算当前的宽高
-    core.createCanvas('weather', 0, 0, core.__PIXELS__, core.__PIXELS__, 80);
-    core.animateFrame.weather.type = type;
-    core.animateFrame.weather.nodes = [];
-    this._setWeather_createNodes(type, level);
+    // core.createCanvas('weather', 0, 0, core.__PIXELS__, core.__PIXELS__, 80);
+    // core.animateFrame.weather.type = type;
+    // core.animateFrame.weather.nodes = [];
+    // this._setWeather_createNodes(type, level);
 }
 
 control.prototype._setWeather_createNodes = function (type, level) {

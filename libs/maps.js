@@ -3,6 +3,7 @@ import {maps_90f36752_8815_4be8_b32b_d7fad1d0542e} from '../project/maps'
 import PriorityQueue from './thirdparty/priority-queue.min.js'
 import utils from '../../pixi/utils';
 import nodes from '../../pixi/nodes';
+import hero from '../../pixi/scenes/hero';
 "use strict";
 
 function maps() {
@@ -2100,11 +2101,14 @@ maps.prototype.drawAnimate = function (name, x, y, callback) {
 ////// 绘制一个跟随勇士的动画 //////
 maps.prototype.drawHeroAnimate = function (name, callback) {
     const animate = core.material.animates[name];
-    const centerX = core.status.heroCenter.px;
-    const centerY = core.status.heroCenter.py;
+    if (!hero.sprite) return;
+    const centerX = hero.sprite.x || 0;
+    const centerY = hero.sprite.y || 0;
     animate.play('event', centerX, centerY, (node) => {
-        node.defaultX = core.status.heroCenter.px;
-        node.defaultY = core.status.heroCenter.py;
+        if (hero.sprite) {
+            node.defaultX = hero.sprite.x;
+            node.defaultY = hero.sprite.y;
+        }
     }, callback);
 }
 

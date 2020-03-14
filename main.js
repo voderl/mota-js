@@ -1,5 +1,7 @@
-import './styles.css';
+import '../mota-js/styles.css';
 import '../pixi/pixi.js';
+
+console.log('loadSecond');
 import actions from './libs/actions.js'
 import control from './libs/control.js'
 import _core from './libs/core.js'
