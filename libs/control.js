@@ -29,7 +29,7 @@ control.prototype._init = function () {
     // this.registerAnimationFrame("weather", true, this._animationFrame_weather);
     // this.registerAnimationFrame("tips", true, this._animateFrame_tips);
     this.registerAnimationFrame("parallelDo", false, this._animationFrame_parallelDo);
-    this.registerAnimationFrame("checkConsoleOpened", true, this._animationFrame_checkConsoleOpened);
+    // this.registerAnimationFrame("checkConsoleOpened", true, this._animationFrame_checkConsoleOpened);
     // --- 注册系统的replay
     this.registerReplayAction("move", this._replayAction_move);
     this.registerReplayAction("item", this._replayAction_item);
