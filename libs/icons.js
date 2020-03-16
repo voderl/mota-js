@@ -1,5 +1,5 @@
 export default icons;
-import {icons_4665ee12_3a1f_44a4_bea3_0fccba634dc1} from '../project/icons'
+import icons_4665ee12_3a1f_44a4_bea3_0fccba634dc1 from 'exports-loader?icons_4665ee12_3a1f_44a4_bea3_0fccba634dc1!../../editor/project/icons'
 "use strict";
 
 function icons() {

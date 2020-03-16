@@ -1,9 +1,10 @@
 export default maps;
-import {maps_90f36752_8815_4be8_b32b_d7fad1d0542e} from '../project/maps'
+import maps_90f36752_8815_4be8_b32b_d7fad1d0542e from 'exports-loader?maps_90f36752_8815_4be8_b32b_d7fad1d0542e!../../editor/project/maps'
 import PriorityQueue from './thirdparty/priority-queue.min.js'
 import utils from '../../pixi/utils';
 import nodes from '../../pixi/nodes';
 import hero from '../../pixi/scenes/hero';
+import Block from '../../pixi/libs/Block';
 "use strict";
 
 function maps() {
@@ -68,9 +69,7 @@ maps.prototype._mapIntoBlocks = function (map, floor, floorId) {
 
 ////// 从ID获得数字 //////
 maps.prototype.getNumberById = function (id) {
-    core.status.id2number = core.status.id2number || {};
-    if (core.status.id2number[id] != null) return core.status.id2number[id];
-    return core.status.id2number[id] = this._getNumberById(id);
+    return Block.getNumberById(id);
 }
 
 maps.prototype._getNumberById = function (id) {
@@ -89,9 +88,7 @@ maps.prototype._getNumberById = function (id) {
 }
 
 maps.prototype.getBlockByNumber = function (number) {
-    core.status.number2Block = core.status.number2Block || {};
-    if (core.status.number2Block[number] != null) return core.status.number2Block[number];
-    return core.status.number2Block[number] = this.initBlock(null, null, number, true);
+    return Block.getBlockByNumber(number);
 }
 
 ////// 数字和ID的对应关系 //////
@@ -121,59 +118,6 @@ maps.prototype.initBlock = function (x, y, id, addInfo, eventFloor) {
     }
     if (main.mode == 'editor') delete block.disable;
     return block;
-}
-
-////// 添加一些信息到block上 //////
-maps.prototype._addInfo = function (block) {
-    if (block.event.cls.indexOf("enemy") == 0 && !block.event.trigger) {
-        block.event.trigger = 'battle';
-    }
-    if (block.event.cls == 'items' && !block.event.trigger) {
-        block.event.trigger = 'getItem';
-    }
-    if (block.event.noPass == null) {
-        if (block.event.cls != 'items') {
-            block.event.noPass = true;
-        }
-    }
-    if (block.event.animate == null) {
-        block.event.animate = core.icons._getAnimateFrames(block.event.cls, false);
-    }
-    block.event.height = 32;
-    if (block.event.cls == 'enemy48' || block.event.cls == 'npc48')
-        block.event.height = 48;
-}
-
-////// 向该楼层添加剧本的自定义事件 //////
-maps.prototype._addEvent = function (block, x, y, event) {
-    if (!event) return;
-    // event是字符串或数组？
-    if (typeof event == "string") {
-        event = {"data": [event]};
-    }
-    else if (event instanceof Array) {
-        event = {"data": event};
-    }
-    event.data = event.data || [];
-
-    // 覆盖enable
-    if (block.disable == null && event.enable != null) {
-        block.disable = !event.enable;
-    }
-    // 覆盖animate
-    if (event.animate === false) {
-        block.event.animate = 1;
-    }
-    // 覆盖所有属性
-    for (var key in event) {
-        if (key != "enable" && key != "animate" && event[key] != null) {
-            block.event[key] = core.clone(event[key]);
-        }
-    }
-    // 给无trigger的增加trigger:action
-    if (!block.event.trigger) {
-        block.event.trigger = 'action';
-    }
 }
 
 ////// 初始化所有地图 //////

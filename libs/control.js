@@ -1,5 +1,5 @@
 export default control;
-import {functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a} from '../project/functions'
+import functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a from 'exports-loader?functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a!../../project/functions'
 import localforage from './thirdparty/localforage.min.js';
 import route from '../../pixi/scenes/route';
 import hero from '../../pixi/scenes/hero';
@@ -628,7 +628,7 @@ control.prototype._moveAction_noPass = function (canMove, callback) {
     core.status.automaticRoute.lastDirection = core.getHeroLoc('direction');
     if (canMove) core.events._trigger(core.nextX(), core.nextY());
     hero.draw();
-
+    hero.stop();
     if (core.status.automaticRoute.moveStepBeforeStop.length==0) {
         this.clearContinueAutomaticRoute();
         core.stopAutomaticRoute();
@@ -719,7 +719,8 @@ control.prototype._moveHero_moving = function () {
                 });
             }
             else {
-                core.moveAction();
+                // core.moveAction();
+                hero.dirty();
                 setTimeout(move, 50);
             }
         }

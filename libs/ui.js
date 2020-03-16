@@ -1,7 +1,8 @@
 export default ui;
-import {functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a} from '../project/functions'
+import functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a from 'exports-loader?functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a!../../project/functions'
 import resize from '../../pixi/resize';
 import tip from '../../pixi/scenes/tip';
+import book from '../../pixi/scenes/book';
 /**
  * ui.js：负责所有和UI界面相关的绘制
  * 包括：
@@ -1570,6 +1571,7 @@ ui.prototype.drawCursor = function () {
 
 ////// 绘制怪物手册 //////
 ui.prototype.drawBook = function (index) {
+    return book.open();
     var floorId = core.floorIds[(core.status.event.ui||{}).index] || core.status.floorId;
     var enemys = core.enemys.getCurrentEnemys(floorId);
     core.clearUI();
@@ -1585,6 +1587,8 @@ ui.prototype.drawBook = function (index) {
         core.fillText('ui', '返回游戏', this.PIXEL - 46, this.PIXEL - 13,'#DDDDDD', this._buildFont(15, true));
         return;
     }
+
+    
 
     index = core.clamp(index, 0, enemys.length - 1);
     core.status.event.data = index;

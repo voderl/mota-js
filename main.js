@@ -15,7 +15,7 @@ import loader from './libs/loader.js'
 import maps from './libs/maps.js'
 import ui from './libs/ui.js'
 import utils from './libs/utils.js'
-import { data_a1e2fb4a_e986_4524_b0da_9b7ba7c0874d } from './project/data'
+import data_a1e2fb4a_e986_4524_b0da_9b7ba7c0874d from 'exports-loader?data_a1e2fb4a_e986_4524_b0da_9b7ba7c0874d!../editor/project/data'
 
 function _main() {
     
@@ -200,7 +200,7 @@ _main.prototype.init = function (mode, callback) {
     core.utils = new utils();
     main.lzw=utils.lzw;
     main.loadFile = {
-        sounds:require.context('./project/sounds',false,/\.(mp3|wav|wma|ogg|ape|acc)$/),
+        sounds: require.context('../editor/project/sounds/', false, /\.(mp3|wav|wma|ogg|ape|acc)$/),
     };
     main.loadFloors(function() {
         var coreData = {};
@@ -286,7 +286,7 @@ _main.prototype.loadFloor = function(floorId, callback) {
     // script.onload = function () {
     //     callback(floorId);
     // }
-    require('./project/floors/'+floorId+'.js');
+    require(`../editor/project/floors/${floorId}.js`);
     callback(floorId);
 }
 

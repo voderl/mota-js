@@ -1,5 +1,5 @@
 export default _core;
-import {plugins_bb40132b_638b_4a9f_b028_d3fe47acc8d1} from '../project/plugins'
+import plugins_bb40132b_638b_4a9f_b028_d3fe47acc8d1 from 'exports-loader?plugins_bb40132b_638b_4a9f_b028_d3fe47acc8d1!../../project/plugins'
 /**
  * 初始化 start
  */

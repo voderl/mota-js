@@ -1,5 +1,5 @@
 export default data;
-import {data_a1e2fb4a_e986_4524_b0da_9b7ba7c0874d} from '../project/data'
+import data_a1e2fb4a_e986_4524_b0da_9b7ba7c0874d from 'exports-loader?data_a1e2fb4a_e986_4524_b0da_9b7ba7c0874d!../../editor/project/data'
 "use strict";
 
 function data() {

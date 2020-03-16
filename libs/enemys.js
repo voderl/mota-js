@@ -1,6 +1,6 @@
 export default enemys;
-import {functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a} from '../project/functions'
-import {enemys_fcae963b_31c9_42b4_b48c_bb48d09f3f80} from '../project/enemys'
+import functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a from 'exports-loader?functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a!../../project/functions'
+import enemys_fcae963b_31c9_42b4_b48c_bb48d09f3f80 from 'exports-loader?enemys_fcae963b_31c9_42b4_b48c_bb48d09f3f80!../../editor/project/enemys'
 "use strict";
 
 function enemys() {
