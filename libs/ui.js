@@ -3,6 +3,7 @@ import functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a from 'exports-loader?funct
 import resize from '../../pixi/resize';
 import tip from '../../pixi/scenes/tip';
 import book from '../../pixi/scenes/book';
+import { Texture } from 'pixi.js-legacy';
 /**
  * ui.js：负责所有和UI界面相关的绘制
  * 包括：
@@ -389,12 +390,23 @@ ui.prototype.drawImage = function (name, image, x, y, w, h, x1, y1, w1, h1) {
     var ctx = this.getContextByName(name);
     if (!ctx) return;
     if (typeof image == 'string') {
-        image = core.getMappedName(image);
-        image = core.material.images.images[image];
+        image = pixi.ui.getTexture(image);
         if (!image) return;
     }
-
+    if (!(image instanceof Object) || x1) {
+        console.warn(arguments);
+    }
+    const renderer = pixi.canvasRenderer;
     // 只能接受2, 4, 8个参数
+    const node = pixi.nodes.getNode('sprite', {
+        texture: image,
+    })
+    const { width, height } = node;
+    renderer.context.clearRect(0,0,width, height);
+    node.renderCanvas(renderer);
+    ctx.drawImage(renderer.view, 0, 0, width, height, x, y, w || width, h || height);
+    node.remove();
+    return;
     if (x != null && y != null) {
         if (w != null && h != null) {
             if (x1 != null && y1 != null && w1 != null && h1 != null) {
@@ -443,7 +455,7 @@ ui.prototype._uievent_drawIcon = function (data) {
 ////// 结束一切事件和绘制，关闭UI窗口，返回游戏进程 //////
 ui.prototype.closePanel = function () {
     this.clearUI();
-    core.maps.generateGroundPattern();
+    // core.maps.generateGroundPattern();
     core.updateStatusBar(true);
     core.unLockControl();
     core.status.event.data = null;
@@ -451,18 +463,23 @@ ui.prototype.closePanel = function () {
     core.status.event.selection = null;
     core.status.event.ui = null;
     core.status.event.interval = null;
+    
 }
 
 ui.prototype.clearUI = function () {
     core.status.boxAnimateObjs = [];
     if (core.dymCanvas._selector) core.deleteCanvas("_selector");
         core.clearMap('ui');
-    core.setAlpha('ui', 1);
+  //  core.setAlpha('ui', 1);
+    pixi.scenes.getScene('ui').flash();
 }
 
 ////// 左上角绘制一段提示 //////
 ui.prototype.drawTip = function (text, id, clear) {
     return tip.draw(text, id);
+}
+ui.prototype.clearTip = function () {
+
 }
 
 ////// 地图中间绘制一段文字 //////
@@ -1571,13 +1588,12 @@ ui.prototype.drawCursor = function () {
 
 ////// 绘制怪物手册 //////
 ui.prototype.drawBook = function (index) {
-    return book.open();
     var floorId = core.floorIds[(core.status.event.ui||{}).index] || core.status.floorId;
     var enemys = core.enemys.getCurrentEnemys(floorId);
     core.clearUI();
     core.clearMap('data');
     // 生成groundPattern
-    core.maps.generateGroundPattern(floorId);
+    // core.maps.generateGroundPattern(floorId);
     this._drawBook_drawBackground();
     core.setAlpha('ui', 1);
 
@@ -1615,11 +1631,11 @@ ui.prototype._drawBook_pageinfo = function () {
 }
 
 ui.prototype._drawBook_drawBackground = function () {
-    core.setAlpha('ui', 1);
-    core.setFillStyle('ui', core.material.groundPattern);
-    core.fillRect('ui', 0, 0, this.PIXEL, this.PIXEL);
+    // core.setAlpha('ui', 1);
+    // core.setFillStyle('ui', core.material.groundPattern);
+    // core.fillRect('ui', 0, 0, this.PIXEL, this.PIXEL);
 
-    core.setAlpha('ui', 0.6);
+    core.setAlpha('ui', 0.8);
     core.setFillStyle('ui', '#000000');
     core.fillRect('ui', 0, 0, this.PIXEL, this.PIXEL);
 }
@@ -1645,11 +1661,12 @@ ui.prototype._drawBook_drawBox = function (index, enemy, top, pageinfo) {
     var img_top = border_top + 5, img_left = border_left + 5;
     core.strokeRect('ui', 22, border_top, 42, 42, '#DDDDDD', 2);
     var blockInfo = core.getBlockInfo(enemy.id);
-    core.status.boxAnimateObjs.push({
-        'bgx': border_left, 'bgy': border_top, 'bgWidth': 42, 'bgHeight': 42,
-        'x': img_left, 'y': img_top, 'height': 32, 'animate': blockInfo.animate,
-        'image': blockInfo.image, 'pos': blockInfo.posY * blockInfo.height
-    });
+    this.drawImage('ui', blockInfo.texture, img_left, img_top);
+    // core.status.boxAnimateObjs.push({
+    //     'bgx': border_left, 'bgy': border_top, 'bgWidth': 42, 'bgHeight': 42,
+    //     'x': img_left, 'y': img_top, 'height': 32, 'animate': blockInfo.animate,
+    //     'image': blockInfo.image, 'pos': blockInfo.posY * blockInfo.height
+    // });
 }
 
 ui.prototype._drawBook_drawName = function (index, enemy, top, left, width) {
@@ -2202,8 +2219,9 @@ ui.prototype._drawToolbox_drawContent = function (info, line, items, page, drawC
         var item = items[this.LAST * (page - 1) + i];
         if (!item) continue;
         var yoffset = line + 54 * Math.floor(i / this.HSIZE) + 19;
-        var icon = core.material.icons.items[item], image = core.material.images.items;
-        core.drawImage('ui', image, 0, 32 * icon, 32, 32, 64 * (i % this.HSIZE) + 21, yoffset, 32, 32);
+        // change
+        
+        core.drawImage('ui', item, 64 * (i % this.HSIZE) + 21, yoffset, 32, 32);
         if (drawCount)
             core.fillText('ui', core.itemCount(item), 64 * (i % this.HSIZE) + 56, yoffset + 33, '#FFFFFF', this._buildFont(14, true));
         if (info.selectId == item)

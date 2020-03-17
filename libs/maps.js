@@ -1677,10 +1677,9 @@ maps.prototype._initDetachedBlock = function (blockInfo, x, y, displayDamage) {
 
 ////// 移动独立的block canvas //////
 maps.prototype._moveDetachedBlock = function (blockInfo, nowX, nowY, opacity, canvases) {
-    var height = blockInfo.height, posX = blockInfo.posX, posY = blockInfo.posY, image = blockInfo.image;
     const { mainNode, damageNode } = canvases;
     if (mainNode) {
-        mainNode.position.set(nowX - core.bigmap.offsetX, nowY + 32 - mainNode.height- core.bigmap.offsetY);
+        mainNode.position.set(nowX - core.bigmap.offsetX + 16, nowY + 32 - mainNode.height / 2 - core.bigmap.offsetY);
         mainNode.alpha = opacity;
         // core.dymCanvas[headCanvas].clearRect(0, 0, 32, height);
         // core.dymCanvas[headCanvas].drawImage(image, posX * 32, posY * height, 32, height - 32, 0, 0, 32, height - 32);
@@ -1696,7 +1695,7 @@ maps.prototype._moveDetachedBlock = function (blockInfo, nowX, nowY, opacity, ca
     if (damageNode) {
         // core.relocateCanvas(damageCanvas, nowX - core.bigmap.offsetX, nowY - core.bigmap.offsetY);
         // core.setOpacity(damageCanvas, opacity);
-        damageNode.position.set(nowX - core.bigmap.offsetX, nowY - core.bigmap.offsetY);
+        damageNode.position.set(nowX - core.bigmap.offsetX + 16, nowY - core.bigmap.offsetY);
         damageNode.alpha = opacity;
     }
 }
