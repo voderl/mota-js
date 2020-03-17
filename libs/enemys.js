@@ -142,17 +142,21 @@ enemys.prototype.getDamageString = function (enemy, x, y, floorId) {
     var damage = this.getDamage(enemy, x, y, floorId);
 
     var color = '#000000';
-
+    let stroke = 'blue';
     if (damage == null) {
         damage = "???";
         color = '#FF0000';
+        stroke = 'black';
     }
     else {
         if (damage <= 0) color = '#00FF00';
         else if (damage < core.status.hero.hp / 3) color = '#FFFFFF';
         else if (damage < core.status.hero.hp * 2 / 3) color = '#FFFF00';
         else if (damage < core.status.hero.hp) color = '#FF7F00';
-        else color = '#FF0000';
+        else {
+            color = 'red';
+            stroke = '#111111';
+        }
 
         damage = core.formatBigNumber(damage, true);
         if (core.enemys.hasSpecial(enemy, 19))
@@ -165,7 +169,8 @@ enemys.prototype.getDamageString = function (enemy, x, y, floorId) {
 
     return {
         "damage": damage,
-        "color": color
+        "color": color,
+        stroke,
     };
 }
 
