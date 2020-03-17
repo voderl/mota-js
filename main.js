@@ -1,5 +1,5 @@
-import '../mota-js/styles.css';
-import '../pixi/pixi.js';
+require('../mota-js/styles.css');
+require('../pixi/pixi.js');
 
 console.log('loadSecond');
 import actions from './libs/actions.js'
