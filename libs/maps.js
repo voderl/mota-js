@@ -5,6 +5,7 @@ import utils from '../../pixi/utils';
 import nodes from '../../pixi/nodes';
 import hero from '../../pixi/scenes/hero';
 import Block from '../../pixi/libs/Block';
+import ui from '../../pixi/ui.js';
 "use strict";
 
 function maps() {
@@ -1730,12 +1731,13 @@ maps.prototype.moveBlock = function (x, y, steps, time, keep, callback) {
     const moveSteps = (steps||[]).filter(function (t) {
         return ['up','down','left','right','forward','backward'].indexOf(t)>=0;
     });
-    const id = utils.getId();
-    core.animateFrame.asyncId[id] = true;
-    pixi.maps.moveBlock(block, moveSteps, time, keep, () => {
-        delete core.animateFrame.asyncId[id];
-        if (callback instanceof Function)callback();
-    });
+    ui.setAsyncAnimate((cb) => {
+        pixi.maps.moveBlock(block, moveSteps, time, keep, () => {
+            cb();
+            if (callback instanceof Function)callback();
+        });
+    })
+    
     // // var canvases = this._initDetachedBlock(blockInfo, x, y, block.event.animate !== false);
     // // this._moveDetachedBlock(blockInfo, 32 * x, 32 * y, 1, canvases);
     // var moveInfo = {
@@ -2011,10 +2013,14 @@ maps.prototype.drawBoxAnimate = function () {
 
 ////// 绘制动画 //////
 maps.prototype.drawAnimate = function (name, x, y, callback) {
-    const animate = core.material.animates[name];
     const centerX = 32 * x + 16;
     const centerY = 32 * y + 16;
-    animate.play('event', centerX, centerY, null, callback);
+    const scene = pixi.game.getScene('event');
+    ui.drawAnimate(name, scene, centerX, centerY, {
+        onComplete() {
+            if (callback instanceof Function) callback();
+        }
+    })
     // name = core.getMappedName(name);
 
     // // 正在播放录像：不显示动画
@@ -2043,16 +2049,19 @@ maps.prototype.drawAnimate = function (name, x, y, callback) {
 
 ////// 绘制一个跟随勇士的动画 //////
 maps.prototype.drawHeroAnimate = function (name, callback) {
-    const animate = core.material.animates[name];
     if (!hero.sprite) return;
     const centerX = hero.sprite.x || 0;
     const centerY = hero.sprite.y || 0;
-    animate.play('event', centerX, centerY, (node) => {
-        if (hero.sprite) {
-            node.defaultX = hero.sprite.x;
-            node.defaultY = hero.sprite.y;
+    const scene = pixi.game.getScene('event');
+    ui.drawAnimate(name, scene, centerX, centerY, {
+        update() {
+            this.defaultX = hero.sprite.x;
+            this.defaultY = hero.sprite.y;
+        },
+        onComplete() {
+            if (callback instanceof Function) callback();
         }
-    }, callback);
+    })
 }
 
 ////// 绘制动画的某一帧 //////

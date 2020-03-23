@@ -2,6 +2,7 @@ export default events;
 import functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a from 'exports-loader?functions_d6ad677b_427a_4623_b50f_a445a3b0ef8a!../../project/functions'
 import events_c12a15a8_c380_4b28_8144_256cba95f760 from 'exports-loader?events_c12a15a8_c380_4b28_8144_256cba95f760!../../editor/project/events'
 import route from '../../pixi/scenes/route';
+import ui from '../../pixi/ui';
 "use strict";
 
 function events() {
@@ -449,28 +450,39 @@ events.prototype._openDoor_check = function (id, x, y, needKey) {
 
 events.prototype._openDoor_animate = function (id, x, y, callback) {
     var door = core.material.icons.animates[id];
-    var speed = id.endsWith("Door") ? 30 : 70;
+    var speed = id.endsWith("Door") ? 50 : 70;
 
     var locked = core.status.lockControl;
     core.lockControl();
     core.status.replay.animate = true;
     core.removeBlock(x, y);
-    core.drawImage('event', core.material.images.animates, 0, 32 * door, 32, 32, 32 * x, 32 * y, 32, 32);
-    var state = 0;
-    var animate = window.setInterval(function () {
-        core.clearMap('event', 32 * x, 32 * y, 32, 32);
-        state++;
-        if (state == 4) {
-            clearInterval(animate);
-            delete core.animateFrame.asyncId[animate];
+    const event = pixi.game.getScene('event');
+    ui.drawAnimate(id, event, x * 32 + 16, y * 32 + 16, {
+        async: true,
+        time: core.status.replay.speed == 24 ? 1 : speed / Math.max(core.status.replay.speed, 1),
+        onComplete() {
             if (!locked) core.unLockControl();
             core.status.replay.animate = false;
             core.events.afterOpenDoor(id, x, y, callback);
             return;
         }
-        core.drawImage('event', core.material.images.animates, 32 * state, 32 * door, 32, 32, 32 * x, 32 * y, 32, 32);
-    }, core.status.replay.speed == 24 ? 1 : speed / Math.max(core.status.replay.speed, 1));
-    core.animateFrame.asyncId[animate] = true;
+    })
+    // core.drawImage('event', core.material.images.animates, 0, 32 * door, 32, 32, 32 * x, 32 * y, 32, 32);
+    // var state = 0;
+    // var animate = window.setInterval(function () {
+    //     core.clearMap('event', 32 * x, 32 * y, 32, 32);
+    //     state++;
+    //     if (state == 4) {
+    //         clearInterval(animate);
+    //         delete core.animateFrame.asyncId[animate];
+    //         if (!locked) core.unLockControl();
+    //         core.status.replay.animate = false;
+    //         core.events.afterOpenDoor(id, x, y, callback);
+    //         return;
+    //     }
+    //     core.drawImage('event', core.material.images.animates, 32 * state, 32 * door, 32, 32, 32 * x, 32 * y, 32, 32);
+    // }, core.status.replay.speed == 24 ? 1 : speed / Math.max(core.status.replay.speed, 1));
+    // core.animateFrame.asyncId[animate] = true;
 }
 
 ////// 开一个门后触发的事件 //////
@@ -2473,19 +2485,29 @@ events.prototype.closeDoor = function (x, y, id, callback) {
     core.playSound('door.mp3');
     var door = core.material.icons.animates[id];
     var speed = id.endsWith("Door") ? 30 : 70, state = 0;
-    var animate = window.setInterval(function () {
-        state++;
-        if (state == 4) {
-            clearInterval(animate);
-            delete core.animateFrame.asyncId[animate];
+    const event = pixi.game.getScene('event');
+    ui.drawAnimate(id, event, x * 32 + 16, y * 32 + 16, {
+        async: true,
+        reverse: true,
+        time: core.status.replay.speed == 24 ? 1 : speed / Math.max(core.status.replay.speed, 1),
+        onComplete() {
             core.setBlock(core.getNumberById(id), x, y);
             if (callback) callback();
-            return;
         }
-        core.clearMap('event', 32 * x, 32 * y, 32, 32);
-        core.drawImage('event', core.material.images.animates, 32 * (4-state), 32 * door, 32, 32, 32 * x, 32 * y, 32, 32);
-    }, core.status.replay.speed == 24 ? 1 : speed / Math.max(core.status.replay.speed, 1));
-    core.animateFrame.asyncId[animate] = true;
+    })
+    // var animate = window.setInterval(function () {
+    //     state++;
+    //     if (state == 4) {
+    //         clearInterval(animate);
+    //         delete core.animateFrame.asyncId[animate];
+    //         core.setBlock(core.getNumberById(id), x, y);
+    //         if (callback) callback();
+    //         return;
+    //     }
+    //     core.clearMap('event', 32 * x, 32 * y, 32, 32);
+    //     core.drawImage('event', core.material.images.animates, 32 * (4-state), 32 * door, 32, 32, 32 * x, 32 * y, 32, 32);
+    // },);
+    // core.animateFrame.asyncId[animate] = true;
 }
 
 ////// 显示图片 //////

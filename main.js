@@ -423,7 +423,7 @@ main.dom.body.onkeyup = function(e) {
 ////// 鼠标按下时 //////
 main.dom.data.onmousedown = function (e) {
     try {
-        e.stopPropagation();
+       //  e.stopPropagation();
         var loc = main.core.actions._getClickLoc(e.clientX, e.clientY);
         if (loc == null) return;
         main.core.ondown(loc);
@@ -433,7 +433,6 @@ main.dom.data.onmousedown = function (e) {
 ////// 鼠标移动时 //////
 main.dom.data.onmousemove = function (e) {
     try {
-        e.stopPropagation();
         var loc = main.core.actions._getClickLoc(e.clientX, e.clientY);
         if (loc == null) return;
         main.core.onmove(loc);
@@ -443,7 +442,6 @@ main.dom.data.onmousemove = function (e) {
 ////// 鼠标放开时 //////
 main.dom.data.onmouseup = function (e) {
     try {
-        e.stopPropagation();
         var loc = main.core.actions._getClickLoc(e.clientX, e.clientY);
         if (loc == null) return;
         main.core.onup(loc);
